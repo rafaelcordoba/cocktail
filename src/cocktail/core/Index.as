@@ -8,6 +8,8 @@ package cocktail.core
 	import cocktail.core.router.RoutesTail;
 	import cocktail.utils.ObjectUtil;
 
+	import flash.display.Stage;
+
 	/**
 	 * Index class is the base class for almost every class inside cocktail.
 	 * @author nybras | nybras@codeine.it
@@ -238,6 +240,13 @@ package cocktail.core
 			return _cocktail.factory;
 		}
 		
+		public function get stage(): Stage
+		{
+			return _cocktail.stage;
+		}
+
+		/* ONE LETTER ALIASES */
+				
 		public function get f(): Factory
 		{
 			return _cocktail.factory;
