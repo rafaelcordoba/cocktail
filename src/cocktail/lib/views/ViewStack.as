@@ -222,6 +222,9 @@ package cocktail.lib.views
 			var node : DListNode;
 			var view: View;
 			
+			// no childs, no destroy
+			if( !list.size ) return;
+			
 			node = list.head;
 			do
 			{
@@ -248,7 +251,7 @@ package cocktail.lib.views
 				view = node.data;
 				
 				if( is_active( view ) )
-					view.render( request );
+					view.run( request );
 					
 			} while( node = node.next );
 		}

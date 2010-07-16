@@ -22,7 +22,7 @@ package cocktail.lib
 		public var gunz_destroy_done : Gun;
 
 		/** Contains and indexes all the childs **/
-		private var _childs : ViewStack;
+		private var _children : ViewStack;
 
 		/** 
 		 * Identifier on parent's ViewStack
@@ -68,8 +68,8 @@ package cocktail.lib
 			
 			_init_gunz( );
 			
-			_childs = new ViewStack( this );
-			_childs.boot( cocktail );
+			_children = new ViewStack( this );
+			_children.boot( cocktail );
 			
 			sprite = null;
 			
@@ -95,7 +95,7 @@ package cocktail.lib
 		 */
 		public function remove( id : String ) : View 
 		{
-			return childs.remove( id );
+			return children.remove( id );
 		}
 
 
@@ -161,7 +161,7 @@ package cocktail.lib
 			var assets : Array;
 			var view : View;
 			
-			childs.mark_all_inactive( );
+			children.mark_all_inactive( );
 
 			// ATT: _parse assets should run after childs.mark_all_inactive()			
 			assets = _parse_assets( request ); 
@@ -174,7 +174,7 @@ package cocktail.lib
 			{
 				view = assets[ i ];
 				
-				childs.mark_as_active( view );
+				children.mark_as_active( view );
 				
 				view.load( request );
 			} while( ++i < assets.length );
@@ -249,15 +249,28 @@ package cocktail.lib
 				log.warn( "Assigned a random id: " + xml_node[ 'id' ] );
 			}
 			
-			if( ( view = childs.by_id( xml_node.@id ) ) != null ) 
+			if( ( view = children.by_id( xml_node.@id ) ) != null ) 
 			{
-				return childs.by_id( xml_node.@id );
+				return children.by_id( xml_node.@id );
 			}
 			
-			return childs.create( xml_node );
+			return children.create( xml_node );
 		}
 
-
+		/**
+		 *	Called from Controller#render
+		 *	
+		 *	Will check before_render, then render 
+		 */
+		public function run( request: Request ) : Boolean
+		{
+			if( !before_render( request ) ) return false;
+			
+			_render( request );
+			
+			return true;
+		}
+		
 		/* r e n d e r   r e l a t e d */
 		
 
@@ -272,14 +285,12 @@ package cocktail.lib
 		}
 
 		/**
-		 * Render itself and the children.
+		 * Render itself and its children.
 		 * 
 		 * Wont render if before_render returns false
 		 */
-		public function render( request : Request ) : *
+		private function _render( request : Request ) : *
 		{
-			if( !before_render( request ) ) return false;
-			
 			log.info( "Running..." );
 			
 			if( sprite == null )
@@ -287,26 +298,36 @@ package cocktail.lib
 			
 			_apply_styles( request );
 
-			childs.render( request );
-			
-			after_render( request );
+			children.render( request );
+
+			render( request );
+
+			if( this != root )
+				up.sprite.addChild( sprite );
+			//childs.on_render_complete.add( after_render, request );
 			
 			return true;
 		}
 
+		public function render( request: Request ) : *
+		{
+			
+		}
+		
 		/**
-		 * Creates then attachs the view sprite.
+		 * Creates the view sprite
 		 * 
-		 * You view should override this function if it has a different
-		 * kind of display.
+		 * If your view has a different thing to instantiate
+		 * ( bitmap, swf, video, etcs ) you should run the super,
+		 * then attach your content to sprite
 		 * 
-		 * ATT: Called by render method when sprite == null
+		 * ATT: Called by render if sprite == null
+		 * 
+		 * @see	View#_render
 		 */
 		protected function _instantiate_display() : *
 		{
 			sprite = new Sprite( );
-			
-			return up.sprite.addChild( sprite );
 		}
 
 		/**
@@ -372,13 +393,13 @@ package cocktail.lib
 		{
 			if( !before_destroy( request ) ) return false;
 		
+			log.info( "Running..." );
+			
 			_destroy_display();
 			
 			gunz.rm_all();
 			
 			clear_delays();
-
-			log.info( "Running..." );
 			
 			after_destroy( request );
 			
@@ -408,9 +429,9 @@ package cocktail.lib
 		}
 
 		/** Getter for the viewstack **/
-		public function get childs() : ViewStack
+		public function get children() : ViewStack
 		{
-			return _childs;
+			return _children;
 		}
 
 		/** Returns the raw XML of this view **/

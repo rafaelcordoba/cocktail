@@ -55,13 +55,11 @@ package cocktail.lib.views
 		 */		
 		override protected function _instantiate_display() : * 
 		{
-			var r: *;
-			
-			r = super._instantiate_display( );
+			super._instantiate_display( );
 			
 			set_triggers();
 			
-			return r; 
+			return sprite; 
 		}
 
 		/**
