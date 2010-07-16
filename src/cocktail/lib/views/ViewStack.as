@@ -282,7 +282,8 @@ package cocktail.lib.views
 			area_path = StringUtil.toUnderscore( view.root.name );
 			
 			if( xml_node.attribute( 'class' ).toString( ) )
-				path = StringUtil.toCamel( xml_node.attribute( 'class' ) );
+				// waiting for a attribute "class", will evaluate views/{area}/{class}View
+				path = xml_node.attribute( 'class' );
 			else
 				path = StringUtil.toCamel( xml_node.localName( ) );
 			
