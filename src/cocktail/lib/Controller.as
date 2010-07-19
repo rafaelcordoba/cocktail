@@ -262,7 +262,8 @@ package cocktail.lib
 			if( _auto_render == false ) return;
 			
 			_layout.gunz_render_done.add( after_render, request ).once( );
-			_layout.render( request );
+			
+			_layout.run( request );
 		}
 
 		/**

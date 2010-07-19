@@ -9,7 +9,6 @@ package cocktail.lib
 	import cocktail.lib.gunz.LayoutBullet;
 	import cocktail.lib.gunz.ViewBullet;
 	import cocktail.utils.StringUtil;
-	import cocktail.utils.Timeout;
 
 	import flash.display.Sprite;
 
@@ -74,12 +73,11 @@ package cocktail.lib
 				on_xml_load_complete.shoot( new LayoutBullet( ) );
 		}
 
-		
 		override internal function _load_attributes() : void 
 		{
 			super._load_attributes( );
-			
-			if( xml_node.hasOwnProperty( 'target' ) )
+		
+			if( attribute( 'target' ) )
 				target = attribute( 'target' );
 		}
 
@@ -112,7 +110,7 @@ package cocktail.lib
 				xml_node = XML( list.toXMLString( ) );
 			
 			//TODO: If target isnt rendered, redirect to asset page
-			if( !factory.layout( name ).childs.has( "" ) )
+			if( !factory.layout( name ).children.has( "" ) )
 			{
 				//redirect
 			}
@@ -166,6 +164,26 @@ package cocktail.lib
 			return _cocktail.app.addChild( sprite = new Sprite( ) );
 		}
 
+		/**
+		 * Returns true if childs.request is equal to param request
+		 * @param request	The request you would check if is rendered
+		 * @see	ViewStack#request
+		 */
+		public function is_rendered( request : Request ) : Boolean
+		{
+			return children.request == request; 
+		}
+
+
+		/* PUBLIC GETTERS */
+
+
+		override public function get loader() : Slave
+		{
+			return _loader;
+		}
+		
+		
 		/* PRIVATE GETTERS */
 
 		/**
@@ -177,24 +195,6 @@ package cocktail.lib
 			log.info( "Running..." );
 			
 			return "layouts/" + StringUtil.toUnderscore( name ) + ".xml";
-		}
-
-		/**
-		 * Returns true if childs.request is equal to param request
-		 * @param request	The request you would check if is rendered
-		 * @see	ViewStack#request
-		 */
-		public function is_rendered( request : Request ) : Boolean
-		{
-			return childs.request == request; 
-		}
-
-
-		/* PUBLIC GETTERS */
-
-		override public function get loader() : Slave
-		{
-			return _loader;
 		}
 		
 		
@@ -231,10 +231,10 @@ package cocktail.lib
 			action_name     = full_path[ 0 ][ 'split' ]( '/' )[ 1 ];
 			asset_id        = full_path[ 1 ];
 
-			if( !factory.layout( controller_name ).childs.by_id( asset_id ) )
+			if( !factory.layout( controller_name ).children.by_id( asset_id ) )
 				return null;
 			
-			return factory.layout( name ).childs.by_id( asset_id );
+			return factory.layout( name ).children.by_id( asset_id );
 		}
 	}
 }

@@ -112,7 +112,6 @@ package cocktail.lib
 			type: String 
 		): Gun
 		{
-			
 			var gun: Gun;
 			
 			gun = new Gun( gunz, this, type );

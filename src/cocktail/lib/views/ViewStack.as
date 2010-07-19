@@ -29,13 +29,17 @@ package cocktail.lib.views
 		/** The "owner" of the view stack **/
 		private var _view : View;
 		
+		/**
+		 * Used to handle all children's render complete, after all
+		 * group rendered, on_render_complete is fired!
+		 */
 		private var _group_rendering : GunzGroup;
 
 		/** Double linked list of view childs **/
 		public var list : DLinkedList;
 
 		/** maping view's ids as key on a dictonary **/
-		public var ids : Dictionary;
+		private var _ids : Dictionary;
 		
 		/** 
 		 * This object holds a "key" for each "active" view in the current
@@ -50,14 +54,14 @@ package cocktail.lib.views
 		 * Then, in the "render" time, views not flaged will be destroyed.
 		 * 
 		 */
-		private var _will_render : Object;
+		private var _active_views : Object;
 
 		/** Last rendered request **/
 		private var _request : Request;
 
 		public function ViewStack( view : View )
 		{
-			ids = new Dictionary( true );
+			_ids = new Dictionary( true );
 			_view = view;
 			
 			list = new DLinkedList( );
@@ -84,7 +88,8 @@ package cocktail.lib.views
 			}
 			
 			// indexing child
-			ids[ child.identifier ] = child;
+			_ids[ view.identifier ] = view;
+			view.node = list.append( view );
 			
 			child.node = list.append( child ); 			
 			child.up = view;
@@ -105,13 +110,17 @@ package cocktail.lib.views
 				return null;
 			}
 			
-			by_id( id ).gunz_destroy_done.add( _after_child_destroy );
+			by_id( id ).gunz_destroy_done.add( _after_destroy_view );
 			by_id( id ).destroy( _request );
 			
 			return null;
 		}
 
-		private function _after_child_destroy( bullet : ViewBullet ) : void 
+		/**
+		 * Called after last view breath, will completely deattach
+		 * view from this stack
+		 */
+		private function _after_destroy_view( bullet : ViewBullet ) : void 
 		{
 			var view : View;
 			
@@ -119,10 +128,10 @@ package cocktail.lib.views
 			
 			//removing from child index
 			list.remove( list.nodeOf( view.identifier ) );
-			ids[ view.identifier ] = null;
+			_ids[ view.identifier ] = null;
 			
-			if( _will_render.hasOwnProperty( view.identifier ) )
-				_will_render[ view.identifier ] = null;
+			if( _active_views.hasOwnProperty( view.identifier ) )
+				_active_views[ view.identifier ] = null;
 		}
 
 		/**
@@ -130,7 +139,7 @@ package cocktail.lib.views
 		 */
 		public function has( id : String ) : Boolean
 		{
-			return ids[ id ] != null;
+			return _ids[ id ] != null;
 		}
 
 		/**
@@ -139,7 +148,7 @@ package cocktail.lib.views
 		public function by_id( id : String ) : View
 		{
 			if( has( id ) ) 
-				return ids[ id ];
+				return _ids[ id ];
 			
 			return null;
 		}
@@ -149,15 +158,20 @@ package cocktail.lib.views
 		 */
 		public function mark_all_inactive() : void
 		{
-			_will_render = {};
+			_active_views = {};
 		}
 
+		public function is_active( view: View ): Boolean
+		{
+			return _active_views[ view.identifier ] === true;
+		}
+		
 		/**
 		 * Flag a view as active, so it will be rendered
 		 */
 		public function mark_as_active( view : View ) : View
 		{
-			_will_render[ view.identifier ] = true;
+			_active_views[ view.identifier ] = true;
 			
 			return view;
 		}
@@ -185,7 +199,7 @@ package cocktail.lib.views
 			{
 				view = node.data;
 
-				if( _will_render[ view.identifier ] )
+				if( _active_views[ view.identifier ] )
 					_group_rendering.add( view.gunz_render_done );
 				else
 					if( WILL_WAIT_DESTROY_BEFORE_TRIGGER_RENDER_DONE )
@@ -201,7 +215,7 @@ package cocktail.lib.views
 			_destroy_all(); /* ¿ transition ? */ _render_all();
 			
 			//reset render poll
-			_will_render = {};
+			_active_views = {};
 		}
 
 		/**
@@ -212,16 +226,19 @@ package cocktail.lib.views
 			var node : DListNode;
 			var view: View;
 			
+			// no childs, no destroy
+			if( !list.size ) return;
+			
 			node = list.head;
-			while ( node )
+			do
 			{
 				view = node.data;
 				
-				if( !_will_render[ view.identifier ] )
+				if( !is_active( view ) )
 					view.destroy( request );
 					
 				node = node.next;
-			}
+			} while( node = node.next );
 		}
 
 		/**
@@ -233,15 +250,14 @@ package cocktail.lib.views
 			var view: View;
 			
 			node = list.head;
-			while ( node )
+			do
 			{
 				view = node.data;
 				
-				if( _will_render[ view.identifier ] )
-					view.render( request );
+				if( is_active( view ) )
+					view.run( request );
 					
-				node = node.next;
-			}
+			} while( node = node.next );
 		}
 
 		/**

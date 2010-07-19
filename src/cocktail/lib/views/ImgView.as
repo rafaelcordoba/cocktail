@@ -4,7 +4,6 @@ package cocktail.lib.views
 	import cocktail.core.slave.slaves.GraphSlave;
 
 	import flash.display.Bitmap;
-	import flash.display.Sprite;
 
 	/**
 	 * @author hems | henrique@cocktail.as
@@ -23,7 +22,9 @@ package cocktail.lib.views
 
 		override protected function _instantiate_display() : * 
 		{
-			return Sprite( super._instantiate_display( ) ).addChild( img ); 
+			super._instantiate_display( );
+			
+			sprite.addChild( img );
 		}
 	}
 }
