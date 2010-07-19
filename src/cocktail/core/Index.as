@@ -150,7 +150,7 @@ package cocktail.core
 		 * 
 		 * @return	Value as <code>Number</code>.
 		 */
-		final protected function n( value : * ) : uint
+		final protected function n( value : * ) : Number
 		{
 			return Number( value );
 		}
