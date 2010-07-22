@@ -243,7 +243,10 @@ package cocktail.lib.views
 		{
 			var node : DListNode;
 			var view: View;
-			
+
+			// no childs, no render
+			if( !list.size ) return;
+						
 			node = list.head;
 			do
 			{
