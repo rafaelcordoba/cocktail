@@ -192,6 +192,21 @@ package cocktail.lib
 			if( attribute( 'src' )  )
 				src = attribute( 'src' );
 		}
+		
+		/**
+		 * This function is a victim from _src_slave's gunz_start.
+		 * 
+		 * If your view has any kind of source, you should override this
+		 * function and save a typed reference for it.
+		 * 
+		 * Also your view should extend the respective kind of view.
+		 */
+		protected function source_start( bullet : ASlaveBullet ) : void
+		{
+			log.error( "This function should be overrided by your view" );
+			
+			bullet;
+		}
 
 		/**
 		 * This function is a victim from _src_slave's gunz_complete.
@@ -489,6 +504,7 @@ package cocktail.lib
 			_src_slave = load_uri( path, false ); 
 			
 			_src_slave.on_error.add( load_fails );
+			_src_slave.on_start.add( source_start );
 			_src_slave.on_complete.add( source_loaded );
 			
 			loader.append( _src_slave );
