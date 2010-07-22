@@ -29,6 +29,7 @@ package cocktail.core.ui.media
 		private var _sound : SoundTransform;
 		private var _video_duration : Number;
 		private var _volume_before_mute : Number;
+		private var _buffer_time : Number;
 		private var _is_muted : Boolean;
 		private var _playhead_timer : Timer;
 		private var gunz : Gunz;
@@ -68,6 +69,8 @@ package cocktail.core.ui.media
 			_video.smoothing  = false;
 			_video.deblocking = 0;
 			
+			_buffer_time = buffer ? buffer : 3;
+			
 			if( width ) 
 				video_width = width;
 			
@@ -82,11 +85,11 @@ package cocktail.core.ui.media
 			_nc.connect( null );
 			
 			_ns = new NetStream( _nc );
-			_ns.bufferTime = buffer;
+			_ns.bufferTime = _buffer_time;
 			_ns.addEventListener( NetStatusEvent.NET_STATUS, _on_meta_data );
 			_ns.soundTransform = _sound = new SoundTransform( );
 			
-			video_volume = volume;
+			video_volume = volume ? volume : 1;
 			
 			//initial status
 			is_playing = false;
@@ -176,7 +179,7 @@ package cocktail.core.ui.media
 			client_listener[ 'onMetaData' ] = onMetaDataHandler;
 			
 			_ns = ns;
-			_ns.bufferTime = 3;
+			_ns.bufferTime = _buffer_time;
 			_ns.client = client_listener;
 			_ns.addEventListener( NetStatusEvent.NET_STATUS, _on_meta_data );
 			_ns.soundTransform = _sound = new SoundTransform( );
@@ -304,15 +307,10 @@ package cocktail.core.ui.media
 				break;
 				
 				case "NetStream.Buffer.Full":
-					_ns.bufferTime *= 3;
-					
-					trace( 'buffer full, updating to: ' + _ns.bufferTime );
-					
 					gunz_bufer_full.shoot( bullet );
 				break;
 		
 				case "NetStream.Buffer.Empty":
-					_ns.bufferTime = 5;
 					gunz_buffer_empty.shoot( bullet );
 				break;
 				

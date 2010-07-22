@@ -69,7 +69,6 @@ package cocktail.lib.views
 		
 		override protected function source_loaded(bullet : ASlaveBullet) : void 
 		{
-			super.source_loaded( bullet );
 		}
 
 		override protected function _instantiate_display() : * 
