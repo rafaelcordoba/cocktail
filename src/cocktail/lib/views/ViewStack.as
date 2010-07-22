@@ -237,7 +237,6 @@ package cocktail.lib.views
 				if( !is_active( view ) )
 					view.destroy( request );
 					
-				node = node.next;
 			} while( node = node.next );
 		}
 
