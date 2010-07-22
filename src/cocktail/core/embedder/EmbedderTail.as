@@ -1,5 +1,6 @@
 package cocktail.core.embedder
 {
+	import cocktail.lib.views.VideoView;
 	import cocktail.lib.models.datasources.AmfDataSource;
 	import cocktail.lib.models.datasources.HttpDataSource;
 	import cocktail.lib.models.datasources.InlineDataSource;
@@ -27,6 +28,7 @@ package cocktail.core.embedder
 			ImgView;
 			SwfView;
 			TextFieldView;
+			VideoView;
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package cocktail.core.slave 
 {
+	import cocktail.core.Index;
 	import cocktail.core.gunz.Gun;
 	import cocktail.core.gunz.Gunz;
 	import cocktail.core.slave.slaves.AudioSlave;
@@ -17,7 +18,7 @@ package cocktail.core.slave
 	 * @author nybras | nybras@codeine.it
 	 * @author hems | henrique@codeine.it
 	 */
-	public class ASlave 
+	public class ASlave extends Index
 	{
 		/** GUNZ **/
 		
@@ -62,7 +63,9 @@ package cocktail.core.slave
 			switch( uri.toLowerCase( ).split( "." ).pop( ) )
 			{
 				case "flv":
+				case "f4v":
 				case "mov":
+				case "mp4":
 					return new VideoSlave( );
 				
 				case "mp3":

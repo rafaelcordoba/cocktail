@@ -73,9 +73,9 @@ package cocktail.lib.views
 		/**
 		 * Adds a view to the view stack
 		 */
-		public function add( view : View ) : View
+		public function add( child : View ) : View
 		{
-			if( has( view.identifier ) )
+			if( has( child.identifier ) )
 			{
 				/**
 				 * TODO: wont add a identifier twice, instead we need to think... 
@@ -84,14 +84,18 @@ package cocktail.lib.views
 				 */
 				log.error( "Identifier is unique in ViewStack" );
 				
-				return view;
+				return child;
 			}
 			
 			// indexing child
 			_ids[ view.identifier ] = view;
 			view.node = list.append( view );
 			
-			return view;
+			child.node = list.append( child ); 			
+			child.up = view;
+			child.boot( cocktail );
+			
+			return child;
 		}
 
 		/**
@@ -290,11 +294,9 @@ package cocktail.lib.views
 				path = StringUtil.toCamel( xml_node.localName( ) );
 			
 			created = View( new ( _cocktail.factory.view( area_path, path ) ) );
-			
-			created.node = list.append( created ); 			
 			created.xml_node = xml_node;
-			created.up = view;
-			created.boot( cocktail );
+			
+			add( created );
 			
 			return created;
 		}
