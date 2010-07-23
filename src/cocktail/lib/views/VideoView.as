@@ -1,5 +1,6 @@
 package cocktail.lib.views 
 {
+	
 	import cocktail.core.slave.gunz.ASlaveBullet;
 	import cocktail.core.slave.slaves.VideoSlave;
 	import cocktail.core.ui.media.VideoComponent;

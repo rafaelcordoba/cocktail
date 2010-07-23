@@ -259,7 +259,7 @@ package cocktail.core.factory
 				return klass;
 
 			// let the user know what happened			
-			log.notice( FactoryMessages.view_not_found( area + '.' + name ) );
+			log.notice( FactoryMessages.view_not_found( name ) );
 			
 			return evaluate( _cocktail.app_id + ".AppView" );
 		}
