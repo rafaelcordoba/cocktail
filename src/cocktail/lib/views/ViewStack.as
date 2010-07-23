@@ -1,6 +1,7 @@
 package cocktail.lib.views 
 {
 	import cocktail.core.Index;
+	import cocktail.core.gunz.Bullet;
 	import cocktail.core.gunz.Gun;
 	import cocktail.core.gunz.GunzGroup;
 	import cocktail.core.request.Request;
@@ -67,7 +68,7 @@ package cocktail.lib.views
 			list = new DLinkedList( );
 			on_render_complete = new Gun( view.gunz, this, "render_complete" );
 			
-			WILL_WAIT_DESTROY_BEFORE_TRIGGER_RENDER_DONE = false;
+			WILL_WAIT_DESTROY_BEFORE_TRIGGER_RENDER_DONE = true;
 		}
 
 		/**
@@ -265,8 +266,9 @@ package cocktail.lib.views
 		 * 
 		 * @see	ViewStack#_group_rendering
 		 */
-		private function _after_render() : void 
+		private function _after_render( bullet: Bullet ) : void 
 		{
+			bullet;
 			log.info( "Running..." );
 			
 			on_render_complete.shoot( new ViewBullet( ) );
@@ -291,10 +293,11 @@ package cocktail.lib.views
 			
 			created = View( new ( _cocktail.factory.view( area_path, path ) ) );
 			
-			created.node = list.append( created ); 			
 			created.xml_node = xml_node;
 			created.up = view;
 			created.boot( cocktail );
+			
+			add( created );
 			
 			return created;
 		}

@@ -164,6 +164,14 @@ package cocktail.lib
 			return _cocktail.app.addChild( sprite = new Sprite( ) );
 		}
 
+		
+		override protected function _destroy_display() : void 
+		{
+			if( !sprite ) return;
+			
+			sprite.parent.removeChild( sprite );
+		}
+
 		/**
 		 * Returns true if childs.request is equal to param request
 		 * @param request	The request you would check if is rendered
