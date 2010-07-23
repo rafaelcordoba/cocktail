@@ -25,7 +25,7 @@ package cocktail.utils
 			_timer.addEventListener( TimerEvent.TIMER_COMPLETE, _complete );
 			
 			_handler = handler;
-			_params = params;
+			_params  = params;
 			
 			if( auto_start )
 				start( );

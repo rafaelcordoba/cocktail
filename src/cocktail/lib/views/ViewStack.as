@@ -72,6 +72,34 @@ package cocktail.lib.views
 		}
 
 		/**
+		 * Instantiate a view based on a xml_node
+		 */
+		public function create( xml_node : XML ) : View 
+		{
+			var created : View;
+			var area_path : String;
+			var path : String;
+			
+			area_path = StringUtil.toUnderscore( view.root.name );
+			
+			if( xml_node.attribute( 'class' ).toString( ) )
+				// waiting for a attribute "class", will evaluate views/{area}/{class}View
+				path = xml_node.attribute( 'class' );
+			else
+				path = StringUtil.toCamel( xml_node.localName( ) );
+			
+			created = View( new ( _cocktail.factory.view( area_path, path ) ) );
+			
+			created.xml_node = xml_node;
+			created.up = view;
+			created.boot( cocktail );
+			
+			add( created );
+			
+			return created;
+		}
+		
+		/**
 		 * Adds a view to the view stack
 		 */
 		public function add( view : View ) : View
@@ -158,6 +186,9 @@ package cocktail.lib.views
 			_active_views = {};
 		}
 
+		/**
+		 * return true if view is active
+		 */
 		public function is_active( view: View ): Boolean
 		{
 			return _active_views[ view.identifier ] === true;
@@ -175,6 +206,7 @@ package cocktail.lib.views
 
 		/**
 		 * Will execute render on alive views and destroy on dead views
+		 * 
 		 */
 		public function render( request : Request ) : void 
 		{
@@ -182,7 +214,11 @@ package cocktail.lib.views
 			var view : View;
 			
 			// no childs, no render
-			if( !list.size ) return;
+			if( !list.size ) 
+			{
+				_after_render( null );
+				return;
+			}
 			
 			log.info( "Running..." );
 			
@@ -215,6 +251,21 @@ package cocktail.lib.views
 			_active_views = {};
 		}
 
+		/**
+		 * Victim of _group_rendering
+		 * 
+		 * @see	ViewStack#render
+		 * 
+		 * @see	ViewStack#_group_rendering
+		 */
+		private function _after_render( bullet: Bullet ) : void 
+		{
+			bullet;
+			log.info( "Running..." );
+			
+			on_render_complete.shoot( new ViewBullet( ) );
+		}
+		
 		/**
 		 * Call destroy in all views that wasnt flaged as "active"
 		 */
@@ -259,49 +310,10 @@ package cocktail.lib.views
 			} while( node = node.next );
 		}
 
-		/**
-		 * Victim of _group_rendering
-		 * 
-		 * @see	ViewStack#render
-		 * 
-		 * @see	ViewStack#_group_rendering
-		 */
-		private function _after_render( bullet: Bullet ) : void 
-		{
-			bullet;
-			log.info( "Running..." );
-			
-			on_render_complete.shoot( new ViewBullet( ) );
-		}
 
-		/**
-		 * Instantiate a view based on a xml_node
-		 */
-		public function create( xml_node : XML ) : View 
-		{
-			var created : View;
-			var area_path : String;
-			var path : String;
-			
-			area_path = StringUtil.toUnderscore( view.root.name );
-			
-			if( xml_node.attribute( 'class' ).toString( ) )
-				// waiting for a attribute "class", will evaluate views/{area}/{class}View
-				path = xml_node.attribute( 'class' );
-			else
-				path = StringUtil.toCamel( xml_node.localName( ) );
-			
-			created = View( new ( _cocktail.factory.view( area_path, path ) ) );
-			
-			created.xml_node = xml_node;
-			created.up = view;
-			created.boot( cocktail );
-			
-			add( created );
-			
-			return created;
-		}
-
+		/** getters **/
+		
+		
 		/**
 		 * Reference to the stack owner
 		 */		

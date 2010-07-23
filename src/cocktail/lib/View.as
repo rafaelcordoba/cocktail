@@ -300,9 +300,22 @@ package cocktail.lib
 		{
 			if( !before_render( request ) ) return false;
 			
-			_render( request );
+			log.info( "Running..." );
+			
+			if( sprite == null )
+				_instantiate_display( );
+			
+			children.on_render_complete.add( _childs_rendred, request ).once();
+			
+			children.render( request );
 			
 			return true;
+		}
+		
+		protected function _childs_rendred( bullet: ViewBullet ): void
+		{
+			log.info( "Running..." );
+			_render( bullet.params );
 		}
 		
 		/* r e n d e r   r e l a t e d */
@@ -326,16 +339,9 @@ package cocktail.lib
 		private function _render( request : Request ) : *
 		{
 			log.info( "Running..." );
-			
-			if( sprite == null )
-				_instantiate_display( );
-			
+
 			_apply_styles( request );
-
-			children.on_render_complete.add( _after_render, request ).once();
 			
-			children.render( request );
-
 			render( request );
 
 			if( !_wait_after_render_shoot )
