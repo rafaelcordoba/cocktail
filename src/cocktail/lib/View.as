@@ -358,11 +358,21 @@ package cocktail.lib
 			return true;
 		}
 
+		/**
+		 * This function will be overwrited by your view, this
+		 * is the "init" of your view
+		 */
 		public function render( request: Request ) : *
 		{
 			
 		}
 		
+		/**
+		 * This should be passed as callback to any assyncronous call in 
+		 * your render proccess.
+		 * 
+		 * It will tell the framework to wait for your render
+		 */
 		public function get call_after_render(): Function
 		{
 			if( _wait_after_render_shoot ) return null;
@@ -372,6 +382,9 @@ package cocktail.lib
 			return _call_after_render;
 		}
 		
+		/**
+		 * Real render done shooter
+		 */
 		private function _call_after_render(): void
 		{
 			gunz_render_done.shoot( new ViewBullet() );
@@ -420,10 +433,12 @@ package cocktail.lib
 				sprite.y = Number( xml_node.@y ); 	
 		}
 
-		public function _after_render( bullet : ViewBullet ) : void
+		/**
+		 * Called after render process
+		 */
+		private function _after_render( bullet : ViewBullet ) : void
 		{
 			log.info( "Running..." );
-			
 			after_render( bullet.params );
 			bullet;
 		}
@@ -435,7 +450,6 @@ package cocktail.lib
 		{
 			log.info( "Running..." );
 			request;
-			gunz_render_done.shoot( new ViewBullet() );
 		}
 
 		
