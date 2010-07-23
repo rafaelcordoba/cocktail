@@ -261,9 +261,14 @@ package cocktail.lib
 			
 			if( _auto_render == false ) return;
 			
-			_layout.gunz_render_done.add( after_render, request ).once( );
+			_layout.gunz_render_done.add( _after_render, request ).once( );
 			
 			_layout.run( request );
+		}
+
+		private function _after_render( bullet : ViewBullet ) : void
+		{
+			after_render( bullet.params );
 		}
 
 		/**
@@ -271,12 +276,11 @@ package cocktail.lib
 		 * 
 		 * @param request
 		 */
-		public function after_render( request : Request ) : void
+		public function after_render( request : Request ): void
 		{
 			log.info( "Running..." );
 			request;
 		}
-
 
 		/* GETTERS */
 

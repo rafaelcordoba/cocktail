@@ -7,6 +7,7 @@ package cocktail.lib
 	import cocktail.core.slave.ISlave;
 	import cocktail.core.slave.Slave;
 	import cocktail.core.slave.gunz.ASlaveBullet;
+	import cocktail.lib.gunz.ViewBullet;
 	import cocktail.lib.views.ViewStack;
 
 	import de.polygonal.ds.DListNode;
@@ -49,6 +50,39 @@ package cocktail.lib
 
 		/** slave for loading **/
 		private var _src_slave : ASlave;
+
+		/**
+		 * This flag will help cocktail to manage your render time.
+		 * 
+		 * Each time the render method is called, this function will
+		 * be setted to FALSE, meaning that your render will take
+		 * no longer then a simple method execution.
+		 * 
+		 * If your render will take some time, ie. tweening or doing
+		 * some assyncronous thing, you have to tell the framework 
+		 * when its done.
+		 * 
+		 * To do that, just call the get_after_render_shooter method,
+		 * and it will return a shooter for you.
+		 * 
+		 * Example 1:
+		 * 	 
+		 * 	TweenMax.to( sprite, 1, { 
+		 * 		alpha: 1,
+		 * 		onComplete: call_after_render
+		 * 	} );
+		 * 	
+		 * Example 2:
+		 *  
+		 *  delay( 1 , call_after_render )
+		 * 
+		 * If you dont do this, cocktail will handle your render as
+		 * immediate.
+		 * 
+		 * After calling this method once, the other calls will return null
+		 * until the next render.
+		 */
+		private var _wait_after_render_shoot : Boolean;
 
 		private function _init_gunz() : void 
 		{
@@ -285,7 +319,7 @@ package cocktail.lib
 		}
 
 		/**
-		 * Render itself and its children.
+		 * Render its children than itself
 		 * 
 		 * Wont render if before_render returns false
 		 */
@@ -298,13 +332,22 @@ package cocktail.lib
 			
 			_apply_styles( request );
 
+			children.on_render_complete.add( _after_render, request ).once();
+			
 			children.render( request );
 
 			render( request );
 
+			if( !_wait_after_render_shoot )
+				if( this != root )
+					call_after_render();
+			
+			/*
+			 * we dont need to handle layout attach, cause its already solved
+			 * on _instantiate_dosplay
+			 */
 			if( this != root )
 				up.sprite.addChild( sprite );
-			//childs.on_render_complete.add( after_render, request );
 			
 			return true;
 		}
@@ -314,6 +357,20 @@ package cocktail.lib
 			
 		}
 		
+		public function get call_after_render(): Function
+		{
+			if( _wait_after_render_shoot ) return null;
+			
+			_wait_after_render_shoot = true;
+			
+			return _call_after_render;
+		}
+		
+		private function _call_after_render(): void
+		{
+			gunz_render_done.shoot( new ViewBullet() );
+		}
+
 		/**
 		 * Creates the view sprite
 		 * 
@@ -357,6 +414,14 @@ package cocktail.lib
 				sprite.y = Number( xml_node.@y ); 	
 		}
 
+		public function _after_render( bullet : ViewBullet ) : void
+		{
+			log.info( "Running..." );
+			
+			after_render( bullet.params );
+			bullet;
+		}
+
 		/**
 		 * Called just after the render function
 		 */
@@ -364,9 +429,10 @@ package cocktail.lib
 		{
 			log.info( "Running..." );
 			request;
+			gunz_render_done.shoot( new ViewBullet() );
 		}
 
-
+		
 		/**
 		 * Should unset all possible triggers.
 		 * 
