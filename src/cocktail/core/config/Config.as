@@ -153,7 +153,7 @@ package cocktail.core.config
 		 */
 		public function get is_in_browser() : Boolean
 		{
-			return( "PlugInActiveX".indexOf( Capabilities.playerType ) != -1 );
+			return Capabilities.playerType.indexOf( 'Plugin'  ) != -1;
 		}
 
 		/**
