@@ -39,22 +39,22 @@ package cocktail.core.config
 			
 			_cocktail = cocktail;
 			
-			_load();
+			_load( );
 			
 			return s;
 		}
 
-		private function _load(): void
+		private function _load() : void
 		{
 			/*
 			PIMP: Replace with core loading || slave
 			 */
-			 
+
 			_xml_loader = new URLLoader( );
 			_xml_loader.addEventListener( Event.COMPLETE, _xml_loaded );
 			_xml_loader.load( new URLRequest( _xml_path ) );			
 		}
-		
+
 		/**
 		 * Called by _xml_loader's complete event
 		 * Keep the configuration file contents.
@@ -63,22 +63,22 @@ package cocktail.core.config
 		{
 			_raw = new XML( String( _xml_loader.data ) );
 			
-			_init_stage();
+			_init_stage( );
 			
-			_init_router();
+			_init_router( );
 		}
 
-		private function _init_stage(): void
+		private function _init_stage() : void
 		{
 			var stage : Stage;
 			
 			stage = _cocktail.app.stage;
-			stage.scaleMode = _movie( "scaleMode" );
-			stage.align = _movie( "align" );
-			stage.showDefaultContextMenu = ( _movie( "showMenu" ) == true );
+			stage.scaleMode = movie( "scaleMode" );
+			stage.align = movie( "align" );
+			stage.showDefaultContextMenu = ( movie( "showMenu" ) == true );
 		}
-		
-		private function _init_router(): void
+
+		private function _init_router() : void
 		{
 			var route : XML;
 			
@@ -87,7 +87,7 @@ package cocktail.core.config
 			
 			router.init( );
 		}
-		
+
 		/* ENVIORNMENT */
 		
 		/**
@@ -115,8 +115,14 @@ package cocktail.core.config
 		 */
 		private function get _xml_path() : String
 		{
-			return	( (	is_in_browser ? "" : "." ) + "./cocktail/config/config.xml" + "?v=" + Math.random( )
-					);
+			var path : String;
+			
+			if( is_in_browser )
+				path = './cocktail/xml/config.xml';
+			else
+				path = '../xml/config.xml';
+
+			return path + "?v=" + Math.random( );
 		}
 
 		/**
@@ -153,7 +159,7 @@ package cocktail.core.config
 		 */
 		public function get is_in_browser() : Boolean
 		{
-			return( "PlugInActiveX".indexOf( Capabilities.playerType ) != -1 );
+			return Capabilities.playerType.indexOf( 'PlugIn' ) != -1;
 		}
 
 		/**
@@ -237,7 +243,7 @@ package cocktail.core.config
 		 * Get the gien property in xml, inside the movie config block.
 		 * @return	The found property value.
 		 */
-		private function _movie( property : String ) : *
+		private function movie( property : String ) : *
 		{
 			return _raw..movie.@[ property ];
 		}
@@ -246,36 +252,18 @@ package cocktail.core.config
 		 * Get the default movie width.
 		 * @return	The default movie width.
 		 */
-		public function get width_movie() : uint
+		public function get movie_width() : uint
 		{
-			return _movie( "width" );
+			return movie( "width" );
 		}
 
 		/**
 		 * Get the default movie height.
 		 * @return	The default movie height.
 		 */
-		public function get height_movie() : uint
+		public function get move_height() : uint
 		{
-			return _movie( "height" );
-		}
-
-		/**
-		 * Get the current stage width.
-		 * @return	The current stage width.
-		 */
-		public function get width_stage() : uint
-		{
-			return _cocktail.app.stage.stageWidth;
-		}
-
-		/**
-		 * Get the current stage height.
-		 * @return	The current stage width.
-		 */
-		public function get height_stage() : uint
-		{
-			return _cocktail.app.stage.stageHeight;
+			return movie( "height" );
 		}
 	}
 }

@@ -4,11 +4,13 @@ package cocktail.core.boot
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.net.URLRequest;
+	import flash.system.Capabilities;
 
 	/**
 	 * Boots the framework, initializing the main preloader, and loading
 	 * the 'core.swf' file.
 	 * @author nybras | nybras@codeine.it
+	 * @author hems | hems@henriquematias.com
 	 */
 	public class BootTail extends Sprite 
 	{
@@ -32,11 +34,11 @@ package cocktail.core.boot
 		/**
 		 * Loader application.
 		 */
-		private function _load( ) : void
+		protected function _load( ) : void
 		{
 			_loader = new Loader( );
 			_loader.contentLoaderInfo.addEventListener( "complete", _render );
-			_loader.load( new URLRequest( _app_path ) );
+			_loader.load( new URLRequest( _core_path ) );
 		}
 
 		/**
@@ -56,9 +58,23 @@ package cocktail.core.boot
 		 * Returns the computed application 'core.swf' path, adding a random
 		 * string to avoid cache.
 		 */
-		private function get _app_path() : String
+		private function get _core_path() : String
 		{
-			return	root.loaderInfo.parameters[ "app" ] + "?cocktail=" + Math.random( );
+			var path: String;
+			
+			if( root.loaderInfo.parameters[ "core" ] )
+			{
+				path = root.loaderInfo.parameters[ "core" ];
+				
+				if( root.loaderInfo.parameters[ "version" ] )
+					path = path + '?v=' + root.loaderInfo.parameters[ "version" ];
+			}
+			else
+			{
+				path = './core.swf';
+			}
+			
+			return path + "?unique=" + Math.random( );
 		}
 	}
 }

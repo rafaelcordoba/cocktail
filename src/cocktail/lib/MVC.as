@@ -102,6 +102,8 @@ package cocktail.lib
 				Timeout( _delays[ i ] ).abort();
 				_delays[ i ]  = null;
 			} while ( ++i < _delays.length );
+			
+			_delays = null;
 		}
 		
 		/**
