@@ -193,8 +193,6 @@ package cocktail.core.ui.media
 		
 		public function onMetaDataHandler( info : Object ) : void 
 		{
-			_video.visible = false;
-			
 			if ( isNaN( video_width ) )
 				video_width = info[ "width" ];
 			

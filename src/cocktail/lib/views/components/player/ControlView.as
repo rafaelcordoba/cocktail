@@ -3,6 +3,7 @@ package cocktail.lib.views.components.player
 	import cocktail.core.gunz.Gun;
 	import cocktail.core.ui.media.VideoComponent;
 	import cocktail.core.ui.media.gunz.VideoBullet;
+	import cocktail.lib.views.InteractiveView;
 	import cocktail.lib.views.SwfView;
 	import cocktail.lib.views.VideoView;
 
@@ -23,13 +24,11 @@ package cocktail.lib.views.components.player
 
 		override protected function _instantiate_display() : * 
 		{
-			log.debug();
-			
 			super._instantiate_display( );
 			
 			_video = VideoView( up.children.by_id( 'video' ) ).video_component;
 			
-			swf.alpha = 0;
+			log.debug( _video );
 			
 			bar_loaded.scaleX = 1;
 			bar_loaded.buttonMode = true;
@@ -42,13 +41,13 @@ package cocktail.lib.views.components.player
 			time_clip.mouseChildren = false;
 			
 			btn_toggle_play.gotoAndStop( 2 );
+			
+			swf.alpha = 0;
 		}
 
 		override public function set_triggers() : void
 		{
-			log.debug();
-			
-			return;
+			super.set_triggers();
 			
 			_video.gunz_time.add( _on_playhead_move );
 			
@@ -57,9 +56,9 @@ package cocktail.lib.views.components.player
 			listen( bar_loaded, MouseEvent.MOUSE_DOWN ).add( _on_mouse_down );
 			listen( time_clip, MouseEvent.MOUSE_DOWN ).add( _on_mouse_down );
 			
-			VideoView( up.children.by_id( 'video' ) ).on_roll_over.add( show_control );
-			VideoView( up.children.by_id( 'video' ) ).on_roll_out.add( hide_control );
-			VideoView( up.children.by_id( 'video' ) ).on_roll_over.add( show_control );
+			InteractiveView( up ).on_roll_over.add( show_control );
+			InteractiveView( up ).on_roll_out.add( hide_control );
+			
 			VideoView( up.children.by_id( 'video' ) ).video_component.gunz_on_metadata.add( _place_control );
 		}
 		
@@ -79,13 +78,15 @@ package cocktail.lib.views.components.player
 
 		private function show_control( ...args  ) : void 
 		{
-			log.debug();
+			_place_control();
 			
 			TweenMax.to( swf, 0.3, { alpha:1 } );
 		}
 
 		private function hide_control( ...args ) : void 
 		{
+			log.debug();
+			
 			TweenMax.to( swf, 0.3, { alpha:0 } );
 		}
 		

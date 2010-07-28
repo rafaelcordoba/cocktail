@@ -320,13 +320,22 @@ package cocktail.lib
 			if( sprite == null )
 				_instantiate_display( );
 			
+			set_triggers();
+			
 			children.on_render_complete.add( _childs_rendred, request ).once();
 			
 			children.render( request );
 			
 			return true;
 		}
-		
+
+		/**
+		 * This function should create all the event handlers
+		 */
+		public function set_triggers() : void 
+		{
+		}
+
 		protected function _childs_rendred( bullet: ViewBullet ): void
 		{
 			log.info( "Running..." );
