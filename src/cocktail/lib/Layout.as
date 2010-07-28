@@ -103,8 +103,11 @@ package cocktail.lib
 			
 			action = request.route.api.action;
 			
-			//.( @id == action || @id == "*" );
-			list = _xml[ action ];
+			//this will parse <{action}>
+			//list = _xml[ action ];
+			
+			//this will parse <area id="{action}">
+			list = _xml[ 'area' ].( @id == action || @id == "*" );
 			
 			if( list )
 				xml_node = XML( list.toXMLString( ) );

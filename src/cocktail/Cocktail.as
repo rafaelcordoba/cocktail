@@ -15,7 +15,9 @@ package cocktail
 	 * Cocktail class is the framework first class to be initialized. It's
 	 * itended to be instantiated by your application main entry class (or your
 	 * document class, if you like), and so the fun starts. :-)
+	 * 
 	 * @author nybras | nybras@codeine.it
+	 * @author hems @ henriquematias.com
 	 */
 	public class Cocktail
 	{
@@ -59,18 +61,18 @@ package cocktail
 			default_uri : String = null
 		)
 		{
-			_app = app;
+			_app    = app;
 			_app_id = app_id;
 			
-			_embedder = embedder;
-			_routes = routes;
+			_embedder    = embedder;
+			_routes      = routes;
 			_default_uri = default_uri;
 			
-			_bind = new Bind( );
+			_bind    = new Bind( );
 			_factory = new Factory( ).boot( this );
 			
 			log_detail = 1;
-			log_level = 3;
+			log_level  = 3;
 			
 			if( !_app.stage )
 				_app.addEventListener( Event.ADDED_TO_STAGE, _init );
@@ -114,6 +116,7 @@ package cocktail
 
 		/**
 		 * Sets the application log level.
+		 * 
 		 * @param level	Application log level (default=3).
 		 * 		<br/># 0=disable
 		 * 		<br/># 1=fatal
@@ -152,7 +155,8 @@ package cocktail
 		/* GENERAL GETTERS */
 		
 		/**
-		 * Get the reference for the app (document_class:Sprite) instance.
+		 * Get the reference for the application scope
+		 * 
 		 * @param	Reference to the app instance.
 		 */
 		public function get app() : Sprite
