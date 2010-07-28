@@ -100,6 +100,7 @@ package cocktail.core.factory
 			path = in_lib ? LIB : _cocktail.app_id; 
 			path = path + "." + folder + "." + classname;
 			
+
 			return evaluate( path );
 		}
 
@@ -250,7 +251,7 @@ package cocktail.core.factory
 			if( ( klass = _mvcl( VIEWS, area + '.' + name + VIEW_SUFIX ) ) )
 				return klass;
 			
-			// app/views/elementst/{name}View
+			// app/views/elements/{name}View
 			if( ( klass = _mvcl( VIEWS, ELEMENTS + '.' + name + VIEW_SUFIX ) ) )
 				return klass;
 			

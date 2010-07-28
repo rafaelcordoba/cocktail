@@ -9,9 +9,9 @@ package cocktail.core.embedder
 	import cocktail.lib.views.SwfView;
 	import cocktail.lib.views.TextFieldView;
 	import cocktail.lib.views.VideoView;
-	import cocktail.lib.views.components.BufferView;
-	import cocktail.lib.views.components.ControlView;
-	import cocktail.lib.views.components.PlayerView;
+	import cocktail.lib.views.components.player.PlayerView;
+	import cocktail.lib.views.components.player.BufferView;
+	import cocktail.lib.views.components.player.ControlView;
 
 	/**
 	 * Embeder class for cocktail.

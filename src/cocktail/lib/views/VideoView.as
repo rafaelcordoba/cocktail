@@ -71,15 +71,20 @@ package cocktail.lib.views
 		override protected function source_loaded(bullet : ASlaveBullet) : void 
 		{
 		}
-
+		
 		override protected function _instantiate_display() : * 
 		{
+			log.debug();
+			
 			super._instantiate_display( );
 			
 			sprite.addChild( video_component.video );
 			
 			if( attribute( 'auto_play' ) == 'true' )
 				video_component.play( );
+			
+			log.debug( sprite, sprite.alpha, sprite.visible );
+			log.debug( video_component.video, video_component.video.alpha, video_component.video.visible );
 			
 			return null;
 		}

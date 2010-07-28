@@ -1,4 +1,4 @@
-package cocktail.lib.views.components 
+package cocktail.lib.views.components.player 
 {
 
 	import cocktail.lib.views.InteractiveView;
