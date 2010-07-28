@@ -67,7 +67,7 @@ package cocktail.lib.models.datasources
 					if( bind_query == "{RAW}" )
 						result = new XML( ( _result as XML ).toXMLString( ) );
 					else
-						result = _query( StringUtil.innerb( bind_query ) );
+						result = query( StringUtil.innerb( bind_query ) );
 					
 					value = value.replace( bind_query, result );
 				}
@@ -77,7 +77,7 @@ package cocktail.lib.models.datasources
 		}
 
 		/* QUERING */
-		protected function _query( e4x : String ) : String
+		public function query( e4x : String ) : String
 		{
 			return E4XParser.evaluate( _result, e4x );
 		}

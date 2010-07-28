@@ -59,7 +59,7 @@ package cocktail.lib.models.datasources
 					if( bind_query == "{RAW}" )
 						result = _result;
 					else
-						result = _query( StringUtil.innerb( bind_query ) );
+						result = query( StringUtil.innerb( bind_query ) );
 					
 					value = value.replace( bind_query, result );
 				}
@@ -69,16 +69,18 @@ package cocktail.lib.models.datasources
 		}
 
 		/* QUERING */
-		override protected function _query( q : String ) : String
+		override public function query( e4x : String ) : String
 		{
 			var steps : Array;
 			var data : *;
 			
-			if ( q == "RAW" )
+			if ( e4x == "RAW" )
 				return _result;
 			
-			q = q.replace( "[", "." ).replace( "].", "." ).replace( "]", "" );
-			steps = q.split( "." );
+			e4x = e4x.replace( "[", "." ).replace( "].", "." );
+			e4x = e4x.replace( "]", "" );
+			
+			steps = e4x.split( "." );
 			data = _result;
 			
 			while ( steps.length ) try 

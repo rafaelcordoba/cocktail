@@ -90,7 +90,7 @@ package cocktail.lib.models.datasources
 					if( bind_query == "{RAW}" )
 						result = _result;
 					else
-						result = _query( StringUtil.innerb( bind_query ) );
+						result = query( StringUtil.innerb( bind_query ) );
 					
 					value = value.replace( bind_query, result );
 				}
