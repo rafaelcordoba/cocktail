@@ -251,13 +251,33 @@ package cocktail.core.ui.media
 				gunz_stop.shoot( _drop() );
 		}
 
-		public function seek( percentage : Number ) : void
+		public function seek( percentage : Number, play: Boolean = false ) : void
 		{
 			percentage = Math.floor( percentage * 1000 ) / 1000;
 			 
 			var bullet : VideoBullet;
+			var seconds : Number;
+			var pct_loaded : Number;
 			
-			_ns.seek( Math.round( percentage * duration ) );
+			pct_loaded = bytes_loaded / bytes_total;
+			
+			trace( '#############', percentage, pct_loaded );
+			
+			if ( percentage > pct_loaded )
+				percentage = pct_loaded;
+				
+			trace( '#############', percentage );
+			
+			seconds = Math.floor( percentage * duration );
+			
+			trace( '#############', seconds );
+			
+			_ns.seek( seconds );
+			
+			if( play)
+				_ns.resume();
+			else
+				_ns.pause();
 			
 			bullet = _drop();
 			
@@ -316,10 +336,12 @@ package cocktail.core.ui.media
 				break;
 				
 				case "NetStream.Buffer.Full":
+					_ns.bufferTime = 0.1;
 					gunz_bufer_full.shoot( bullet );
 				break;
 		
 				case "NetStream.Buffer.Empty":
+					_ns.bufferTime = _buffer_time;
 					gunz_buffer_empty.shoot( bullet );
 				break;
 				
@@ -330,8 +352,8 @@ package cocktail.core.ui.media
 						gunz_play_complete.shoot( bullet );
 				break;
 				
-				case "NetStream.Play.Complete":
-					//just a joke?
+				case "NetStream.Seek.InvalidTime":
+					
 				break;
 			}
 		}
