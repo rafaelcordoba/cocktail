@@ -119,27 +119,28 @@ package cocktail.lib
 				//redirect
 			}
 			
+			//reset the loader
 			_loader.reset( );			
 			
+			//check for before_load, parse and load children
 			if( !super.load( request ) ) return false;
 			
-			if( loader.length )
+			//if no children wont need loading, return!
+			if( !loader.length )
 			{
-				loader.on_complete.add( _after_load, request ).once( );
-				loader.on_error.add( _load_assets_failed, request ).once( );
-				loader.load( );
-			}
-			else
-			{
-				_after_load( );
-				
 				var bullet : ViewBullet;
 				
 				bullet = new ViewBullet( );
 				bullet.params = request;
 				
-				delay( .01, _after_load, bullet );
+				_after_load( bullet );
+				
+				return false;
 			}
+			
+			loader.on_complete.add( _after_load, request ).once( );
+			loader.on_error.add( _load_assets_failed, request ).once( );
+			loader.load( );
 				
 			return true;
 		}

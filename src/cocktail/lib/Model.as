@@ -86,29 +86,29 @@ package cocktail.lib
 			
 			log.info( "Running..." );
 			
-			if( ( ds_list = _parse_datasources( request ) ).length )
+			ds_list = _parse_datasources( request );
+			
+			if( !ds_list.length )
 			{
-				group = new GunzGroup( );
-				group.gunz_complete.add( _after_load );
-				
-				do
-				{
-					ds = ds_list[ i ];
-					group.add( ds.gunz_load_complete );
-					ds.load( );
-				} while( ++i < ds_list.length );
-			}
-			else
-			{
-				_after_load();
-				
 				var bullet : ModelBullet;
 				
 				bullet = new ModelBullet( );
 				bullet.params = request;
 				
-				delay( .01, _after_load, bullet );
+				_after_load( bullet );
+				
+				return false;
 			}
+			
+			group = new GunzGroup( );
+			group.gunz_complete.add( _after_load );
+			
+			do
+			{
+				ds = ds_list[ i ];
+				group.add( ds.gunz_load_complete );
+				ds.load( );
+			} while( ++i < ds_list.length );
 			
 			return true;
 		}

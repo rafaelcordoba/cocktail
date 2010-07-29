@@ -156,8 +156,10 @@ package cocktail.lib
 		private function _load_xml( request : Request ) : void
 		{
 			_load_group = new GunzGroup( );
+			
 			_load_group.add( _layout.on_xml_load_complete );
 			_load_group.add( _model.on_xml_load_complete );
+			
 			_load_group.gunz_complete.add( _xml_loaded, request );
 			
 			_model.load_xml( request );
@@ -173,7 +175,9 @@ package cocktail.lib
 		{
 			log.info( "Running..." );
 			bullet;
+			
 			_is_xml_loaded = true;
+			
 			_load( bullet.params );
 		}
 
@@ -186,12 +190,7 @@ package cocktail.lib
 			
 			_model.on_load_complete.add( _model_loaded, request ).once();
 			
-			if( !_model.load( request ) )
-			{
-				_model.on_load_complete.rm( _model_loaded );
-				
-				_load_layout( request );
-			}
+			_model.load( request );
 		}
 
 		/**
