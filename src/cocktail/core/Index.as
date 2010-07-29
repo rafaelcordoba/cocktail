@@ -76,6 +76,23 @@ package cocktail.core
 		 * 
 		 * @return	The proxy function with the given params.
 		 */
+		final public function apply(
+			properties: Object, 
+			target: Object 
+		) : Function
+		{
+			return ObjectUtil.apply( properties, target );
+		}
+		/**
+		 * Creates a proxy function holding default params.
+		 * 
+		 * @param method	Method to be handled.
+		 * 
+		 * @param params	Default params to be passed to method, these params
+		 * will be added in *first* place.
+		 * 
+		 * @return	The proxy function with the given params.
+		 */
 		final public function proxy( method : Function, ...params ) : Function
 		{
 			return( function( ...innerParams ):void
@@ -83,7 +100,7 @@ package cocktail.core
 				method.apply( method.prototype, params.concat( innerParams ) );
 			} );
 		}
-
+		
 		/**
 		 * Check if some property/method/variable is defined in the given scope.
 		 * 
