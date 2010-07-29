@@ -83,13 +83,13 @@ package cocktail.core
 		{
 			return ObjectUtil.apply( properties, target );
 		}
+
 		/**
 		 * Creates a proxy function holding default params.
 		 * 
 		 * @param method	Method to be handled.
 		 * 
-		 * @param params	Default params to be passed to method, these params
-		 * will be added in *first* place.
+		 * @param params	Default params to be passed to method
 		 * 
 		 * @return	The proxy function with the given params.
 		 */
@@ -97,7 +97,7 @@ package cocktail.core
 		{
 			return( function( ...innerParams ):void
 			{
-				method.apply( method.prototype, params.concat( innerParams ) );
+				method.apply( method.prototype, params );
 			} );
 		}
 		

@@ -2,6 +2,7 @@ package cocktail.lib
 {
 	import cocktail.Cocktail;
 	import cocktail.core.gunz.Bullet;
+	import cocktail.core.logger.msgs.LayoutMessages;
 	import cocktail.core.request.Request;
 	import cocktail.core.router.RouteEval;
 	import cocktail.core.slave.Slave;
@@ -94,15 +95,9 @@ package cocktail.lib
 			return true;
 		}
 
-		/**
-		 * 
-		 */
-		override public function load( request : Request ) : Boolean 
+		public function parse_action( action: String ): void
 		{
 			var list : XMLList;
-			var action : String;
-			
-			action = request.route.eval.action;
 			
 			//this will parse <{action}>
 			//list = _xml[ action ];
@@ -111,12 +106,31 @@ package cocktail.lib
 			list = _xml[ 'action' ].( @id == action || @id == "*" );
 			
 			if( list )
-				xml_node = XML( list.toXMLString( ) );
+				xml_node = XML( list.toXMLString( ) );			
+		}
+		
+		/**
+		 * 
+		 */
+		override public function load( request : Request ) : Boolean 
+		{
+			var action : String;
+			
+			action = request.route.eval.action;
+			
+			parse_action( action );
+			
+			if( !xml_node )
+			{
+				log.error( LayoutMessages.no_action_to_load );
+				return false;
+			}
 			
 			//TODO: If target isnt rendered, redirect to asset page
 			if( scope == null )
 			{
 				//redirect
+				//request.loading = true;
 			}
 			
 			//reset the loader

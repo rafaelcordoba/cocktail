@@ -137,14 +137,14 @@ package cocktail.lib
 			
 			log.info( "Running..." );
 			
-			if( !_is_xml_loaded ) 
+			if( _is_xml_loaded ) 
 			{
-				_load_xml( request );
-				on_load_start.shoot( new ControllerBullet( ) );
+				_load_model( request );
 				return;
 			}
 			
-			_load_model( request );
+			_load_xmls( request );
+			on_load_start.shoot( new ControllerBullet( ) );			
 		}
 
 
@@ -153,33 +153,29 @@ package cocktail.lib
 		 * 
 		 * @param request	Request that will be loaded after load scheme. 
 		 */
-		private function _load_xml( request : Request ) : void
+		private function _load_xmls( request : Request ) : void
 		{
 			_load_group = new GunzGroup( );
 			
 			_load_group.add( _layout.on_xml_load_complete );
 			_load_group.add( _model.on_xml_load_complete );
 			
-			_load_group.gunz_complete.add( _xml_loaded, request );
+			_load_group.gunz_complete.add( _after_load_xmls );
+			_load_group.gunz_complete.add( proxy( _load, request ) );
 			
 			_model.load_xml( request );
 			_layout.load_xml( request );
 		}
 
 		/**
-		 * Triggered after load  model and layout xml.
-		 * 
-		 * @param bullet
+		 * Fired after model and layout loads its xmls
 		 */
-		private function _xml_loaded( bullet : Bullet ) : void
+		private function _after_load_xmls( bullet: Bullet ): void
 		{
-			log.info( "Running..." );
 			bullet;
-			
 			_is_xml_loaded = true;
-			
-			_load( bullet.params );
 		}
+		
 
 		/**
 		 * @param request
@@ -258,6 +254,7 @@ package cocktail.lib
 			
 			_layout.gunz_render_done.add( _after_render, request ).once( );
 			
+			//layout's run will handle layout render
 			_layout.run( request );
 		}
 
