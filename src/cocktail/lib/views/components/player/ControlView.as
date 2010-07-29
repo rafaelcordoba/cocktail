@@ -19,7 +19,8 @@ package cocktail.lib.views.components.player
 	public class ControlView extends SwfView
 	{
 		private var _video : VideoComponent;
-		private var _gun_mouse_move : Gun;
+		private var _gun_mouse_move_seek : Gun;
+		private var _gun_mouse_move_volume : Gun;
 		private var _gun_stage_up : Gun;
 
 		override protected function _instantiate_display() : * 
@@ -40,6 +41,9 @@ package cocktail.lib.views.components.player
 			time_clip.buttonMode = true;
 			time_clip.mouseChildren = false;
 			
+			volume_slider.buttonMode = true;
+			volume_slider.mouseChildren = false;
+			
 			btn_toggle_play.gotoAndStop( 2 );
 			
 			swf.alpha = 0;
@@ -53,8 +57,9 @@ package cocktail.lib.views.components.player
 			
 			listen( btn_toggle_play, MouseEvent.CLICK ).add( _toggle_play );
 			listen( bar_loaded, MouseEvent.CLICK ).add( _seek_click );
-			listen( bar_loaded, MouseEvent.MOUSE_DOWN ).add( _on_mouse_down );
-			listen( time_clip, MouseEvent.MOUSE_DOWN ).add( _on_mouse_down );
+			listen( bar_loaded, MouseEvent.MOUSE_DOWN ).add( _on_mouse_down_seek );
+			listen( time_clip, MouseEvent.MOUSE_DOWN ).add( _on_mouse_down_seek );
+			listen( volume_slider, MouseEvent.MOUSE_DOWN ).add( _on_mouse_down_volume );
 			
 			InteractiveView( up ).on_roll_over.add( show_control );
 			InteractiveView( up ).on_roll_out.add( hide_control );
@@ -71,9 +76,13 @@ package cocktail.lib.views.components.player
 			
 			bg.width = _video.video_width - 10;
 			
-			bar_base[ 'bar' ][ 'width' ] 	= bg.width - seek_bar.x - 20;
-			bar_loaded[ 'bar' ][ 'width' ] 	= bg.width - seek_bar.x - 20;
-			bar_played[ 'bar' ][ 'width' ] 	= bg.width - seek_bar.x - 20;
+			btn_toggle_play.x = 10;
+			seek_bar.x = btn_toggle_play.x + btn_toggle_play.width + 10;
+			volume_slider.x = bg.width - volume_slider.width - 10;
+			
+			bar_base[ 'bar' ][ 'width' ] 	= bg.width - seek_bar.x - volume_slider.width - 20;
+			bar_loaded[ 'bar' ][ 'width' ] 	= bg.width - seek_bar.x - volume_slider.width - 20;
+			bar_played[ 'bar' ][ 'width' ] 	= bg.width - seek_bar.x - volume_slider.width - 20;
 		}
 
 		private function show_control( ...args  ) : void 
@@ -108,10 +117,16 @@ package cocktail.lib.views.components.player
 		{
 			log.debug();
 			
-			if ( _gun_mouse_move )
+			if ( _gun_mouse_move_seek )
 			{
-				_gun_mouse_move.rm( _on_mouse_move );
-				_gun_mouse_move = null;
+				_gun_mouse_move_seek.rm( _on_mouse_move_seek );
+				_gun_mouse_move_seek = null;
+			}
+			
+			if ( _gun_mouse_move_volume )
+			{
+				_gun_mouse_move_volume.rm( _on_mouse_move_volume );
+				_gun_mouse_move_volume = null;
 			}
 			
 			if ( _gun_stage_up )
@@ -121,22 +136,54 @@ package cocktail.lib.views.components.player
 			}
 		}
 
-		private function _on_mouse_down( ...args ) : void 
+		private function _on_mouse_down_seek( ...args ) : void 
 		{
-			log.debug();
+			_gun_mouse_move_seek = listen( sprite.stage, MouseEvent.MOUSE_MOVE );
+			_gun_mouse_move_seek.add( _on_mouse_move_seek );
 			
-			_gun_mouse_move = listen( sprite.stage, MouseEvent.MOUSE_MOVE );
-			_gun_mouse_move.add( _on_mouse_move );
+			_gun_stage_up = listen( sprite.stage, MouseEvent.MOUSE_UP );
+			_gun_stage_up.add( _on_mouse_up );
+		}
+		
+		private function _on_mouse_down_volume( ...args  ) : void
+		{
+			_video.volume = _resize_volume_slider();
+			_resize_volume_slider();
+			
+			_gun_mouse_move_volume = listen( sprite.stage, MouseEvent.MOUSE_MOVE );
+			_gun_mouse_move_volume.add( _on_mouse_move_volume );
 			
 			_gun_stage_up = listen( sprite.stage, MouseEvent.MOUSE_UP );
 			_gun_stage_up.add( _on_mouse_up );
 		}
 
-		private function _on_mouse_move( ...args ) : void 
+		private function _on_mouse_move_seek( ...args ) : void 
 		{
-//			log.debug();
-			
 			_seek_click();
+		}
+		
+		private function _on_mouse_move_volume( ...args ) : void 
+		{
+			_video.volume = _resize_volume_slider();
+
+			_resize_volume_slider();
+		}
+		
+		private function _resize_volume_slider() : Number
+		{
+			var pct : Number;
+			
+			pct = volume_slider.mouseX / volume_slider[ 'base' ][ 'width' ];
+			
+			if ( pct > 1 )
+				pct = 1;
+				
+			if ( pct < 0 )
+				pct = 0;
+			
+			slider.scaleX = pct;
+			
+			return pct;
 		}
 		
 		private function _seek_click( ...args ) : void 
@@ -210,6 +257,21 @@ package cocktail.lib.views.components.player
 		public function get txt_played() : TextField
 		{
 			return time_clip[ 'txt_played' ];
+		}
+		
+		public function get volume_slider() : MovieClip
+		{
+			return swf[ 'volume_slider' ];
+		}
+		
+		public function get slider() : MovieClip
+		{
+			return volume_slider[ 'slider' ];
+		}
+		
+		public function get slider_mask() : MovieClip
+		{
+			return volume_slider[ 'mask_mc' ];
 		}
 	}
 }

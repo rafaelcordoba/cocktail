@@ -57,8 +57,13 @@ package cocktail.lib.views
 				_video_buffer = n( attribute( 'buffer' ) ); 
 				
 			if( attribute( 'volume' ) )
-				_video_volume = n( attribute( 'volume' ) ); 
+			{
+				_video_volume = n( attribute( 'volume' ) );
 				
+				if ( _video_volume > 1 )
+					_video_volume = 1;
+			} 
+			
 			video_component = new VideoComponent( null, 
 												  _video_width, 
 												  _video_height, 
