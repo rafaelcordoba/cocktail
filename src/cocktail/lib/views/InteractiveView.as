@@ -57,8 +57,6 @@ package cocktail.lib.views
 		{
 			super._instantiate_display( );
 			
-			set_triggers();
-			
 			return sprite; 
 		}
 
@@ -100,8 +98,10 @@ package cocktail.lib.views
 		 * 
 		 * Called automatically once - when creating the view sprite
 		 */
-		public function set_triggers() : void 
+		override public function set_triggers() : void 
 		{
+			super.set_triggers();
+			
 			if( is_defined( 'click' ) )
 				on_click.add( this[ 'click' ] );
 			

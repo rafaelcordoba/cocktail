@@ -1,9 +1,8 @@
-package cocktail.lib.views.components 
+package cocktail.lib.views.components.player 
 {
-
-	import cocktail.lib.views.VideoView;
 	import cocktail.lib.views.InteractiveView;
-	
+	import cocktail.lib.views.VideoView;
+
 	/**
 	 * @author rafaelcordoba
 	 */
@@ -11,10 +10,12 @@ package cocktail.lib.views.components
 	{
 		override protected function _instantiate_display() : * 
 		{
-			control_view.set_video( video_view.video_component );
+			log.debug();
 			
 			return super._instantiate_display( );
 		}
+
+		/* Getters */
 		
 		public function get video_view() : VideoView
 		{
@@ -29,7 +30,7 @@ package cocktail.lib.views.components
 		{
 			if ( ! up.children.has( 'control' ) )
 				log.error( 'You need to create a <control> tag in your XML with id="control"' );
-				
+		
 			return ControlView( up.children.by_id( 'control' )  );
 		}
 		

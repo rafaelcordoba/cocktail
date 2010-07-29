@@ -70,10 +70,13 @@ package cocktail.lib.views
 		
 		override protected function source_loaded(bullet : ASlaveBullet) : void 
 		{
+			log.debug();
 		}
-
+		
 		override protected function _instantiate_display() : * 
 		{
+			log.debug();
+			
 			super._instantiate_display( );
 			
 			sprite.addChild( video_component.video );

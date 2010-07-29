@@ -47,7 +47,8 @@ package cocktail.core.ui.media
 		public var gunz_seek : Gun;
 		public var gunz_mute : Gun;
 		public var gunz_unmute : Gun;
-		public var gunz_metadata : Gun;
+		public var gunz_net_status : Gun;
+		public var gunz_on_metadata : Gun;
 		public var gunz_load_error : Gun;
 		public var gunz_bufer_full : Gun;
 		public var gunz_buffer_empty : Gun;
@@ -86,10 +87,10 @@ package cocktail.core.ui.media
 			
 			_ns = new NetStream( _nc );
 			_ns.bufferTime = _buffer_time;
-			_ns.addEventListener( NetStatusEvent.NET_STATUS, _on_meta_data );
+			_ns.addEventListener( NetStatusEvent.NET_STATUS, _on_net_status );
 			_ns.soundTransform = _sound = new SoundTransform( );
 			
-			video_volume = volume ? volume : 1;
+			video_volume = volume;
 			
 			//initial status
 			is_playing = false;
@@ -106,7 +107,8 @@ package cocktail.core.ui.media
 			gunz_seek          = new Gun( gunz, this, VideoBullet.SEEK );
 			gunz_mute          = new Gun( gunz, this, VideoBullet.MUTE );
 			gunz_unmute        = new Gun( gunz, this, VideoBullet.UNMUTE );
-			gunz_metadata      = new Gun( gunz, this, VideoBullet.METADATA );
+			gunz_net_status    = new Gun( gunz, this, VideoBullet.NET_STATUS );
+			gunz_on_metadata   = new Gun( gunz, this, VideoBullet.METADATA );
 			gunz_load_error    = new Gun( gunz, this, VideoBullet.LOAD_ERROR );
 			gunz_bufer_full    = new Gun( gunz, this, VideoBullet.BUFFER_FULL );
 			gunz_buffer_empty  = new Gun( gunz, this, VideoBullet.BUFFER_EMPTY );
@@ -151,8 +153,10 @@ package cocktail.core.ui.media
 			var bullet: VideoBullet;
 			
 			bullet = new VideoBullet();
-			bullet.played = played;
+			bullet.seconds_played = time;
+			bullet.percent_played = played_pct;
 			bullet.buffered = buffered;
+			bullet.seconds_total = duration;
 			
 			return bullet;			
 		}
@@ -181,7 +185,7 @@ package cocktail.core.ui.media
 			_ns = ns;
 			_ns.bufferTime = _buffer_time;
 			_ns.client = client_listener;
-			_ns.addEventListener( NetStatusEvent.NET_STATUS, _on_meta_data );
+			_ns.addEventListener( NetStatusEvent.NET_STATUS, _on_net_status );
 			_ns.soundTransform = _sound = new SoundTransform( );
 			
 			_video.attachNetStream( _ns );
@@ -201,6 +205,11 @@ package cocktail.core.ui.media
 			_video.height = video_height;
 			
 			volume = video_volume;
+			
+			var bullet : VideoBullet;
+			bullet = _drop();
+			
+			gunz_on_metadata.shoot( bullet );
 		}
 
 		public function unload() : void 
@@ -213,6 +222,7 @@ package cocktail.core.ui.media
 			is_playing = true;
 			_ns.resume( );
 			
+			_playhead_timer.stop( );
 			_playhead_timer.start( );
 			
 			gunz_play.shoot( _drop() );
@@ -221,9 +231,10 @@ package cocktail.core.ui.media
 		public function pause( ...args ) : void
 		{
 			is_playing = false;
+		
 			_ns.pause( );
 			
-			_playhead_timer.stop( );
+			//_playhead_timer.stop( );
 			
 			gunz_pause.shoot( _drop() );
 		}
@@ -246,15 +257,13 @@ package cocktail.core.ui.media
 			 
 			var bullet : VideoBullet;
 			
+			_ns.seek( Math.round( percentage * duration ) );
+			
 			bullet = _drop();
 			
-			_ns.seek( bullet.seek = Math.round( percentage * duration ) );
-
-			gunz_seek.shoot( bullet );			
+			gunz_seek.shoot( bullet );
 		}
 
-		
-		
 		/** audio controls **/
 
 		
@@ -288,14 +297,14 @@ package cocktail.core.ui.media
 
 		
 		
-		private function _on_meta_data( event : NetStatusEvent ) : void
+		private function _on_net_status( event : NetStatusEvent ) : void
 		{
 			var bullet : VideoBullet;
 			
 			bullet = _drop();
 			bullet.info = event.info;
 			
-			gunz_metadata.shoot( bullet );
+			gunz_net_status.shoot( bullet );
 			
 			bullet = _drop();
 			bullet.info = event.info;
@@ -376,9 +385,9 @@ package cocktail.core.ui.media
 		/*
 		 * @return Played time, from 0 to 1
 		 */
-		public function get played() : Number
+		public function get played_pct() : Number
 		{
-			return Math.round( time / duration * 100 ) / 100;
+			return time / duration;
 		}
 
 		/**
@@ -421,7 +430,10 @@ package cocktail.core.ui.media
 
 		public function get player() : Sprite
 		{
-			return _player;
+			if ( _player )
+				return _player;
+			else
+				return null;
 		}
 
 		public function set player( scope : Sprite ) : void
