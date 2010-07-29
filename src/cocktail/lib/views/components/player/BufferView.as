@@ -29,8 +29,6 @@ package cocktail.lib.views.components.player
 
 		private function _on_net_status( bullet : VideoBullet ) : void 
 		{
-			log.debug(  bullet.info[ 'code' ] );
-			
 			switch( bullet.info[ 'code' ] )
 			{
 				case "NetStream.Buffer.Full":

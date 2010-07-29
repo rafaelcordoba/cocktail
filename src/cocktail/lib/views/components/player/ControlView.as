@@ -51,7 +51,7 @@ package cocktail.lib.views.components.player
 		{
 			super.set_triggers();
 			
-			_video.gunz_time.add( _on_playhead_move );
+			_video.on_time.add( _on_playhead_move );
 			_video.gunz_on_metadata.add( _align_controls );
 			
 			player.on_roll_over.add( show_control );
@@ -135,7 +135,7 @@ package cocktail.lib.views.components.player
 			
 			on_drag.add( _seek );
 			
-			on_mouse_up.add( _on_time_release ).once();
+			on_stage_up.add( _on_time_release ).once();
 		}
 		
 		private function _on_mouse_down_volume( ...args  ) : void
@@ -145,7 +145,7 @@ package cocktail.lib.views.components.player
 			
 			on_drag.add( _on_drag_volume );
 			
-			on_mouse_up.add( _on_volume_release ).once();
+			on_stage_up.add( _on_volume_release ).once();
 		}
 
 		private function _save_video_status( ...args ): void
@@ -197,8 +197,6 @@ package cocktail.lib.views.components.player
 		
 		private function _on_playhead_move( bullet : VideoBullet ) : void
 		{
-//			log.debug( bullet.seconds_played );
-			
 			txt_played.text = bullet.time_played;
 			
 			bar_loaded.scaleX = bullet.buffered;
