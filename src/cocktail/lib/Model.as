@@ -107,7 +107,7 @@ package cocktail.lib
 				bullet = new ModelBullet( );
 				bullet.params = request;
 				
-				delay( 1, _after_load, bullet );
+				delay( .01, _after_load, bullet );
 			}
 			
 			return true;
