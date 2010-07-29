@@ -3,7 +3,6 @@ package cocktail.core.router
 	import cocktail.Cocktail;
 	import cocktail.core.request.Request;
 	import cocktail.core.request.RequestAsync;
-	import cocktail.lib.Controller;
 
 	import com.asual.swfaddress.SWFAddress;
 	import com.asual.swfaddress.SWFAddressEvent;
@@ -167,11 +166,7 @@ package cocktail.core.router
 
 		private function run( request : Request ) : * 
 		{
-			var ctl : Controller;
-			
-			ctl = _cocktail.factory.controller( request.route.api.controller );
-			 
-			return ctl.run( request );
+			return request.route.eval.controller.run( request );
 		}
 	}
 }

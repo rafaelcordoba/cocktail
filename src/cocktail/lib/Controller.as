@@ -18,7 +18,7 @@ package cocktail.lib
 		/** Each render, this flag turns true.
 		 * If your action turns this to false, _layout_render wont occur
 		 */
-		private var _auto_render : Boolean;
+		public var auto_render : Boolean;
 
 		/**
 		 * Last runned _request. 
@@ -251,15 +251,11 @@ package cocktail.lib
 			
 			log.info( "Running..." );
 			
-			_auto_render = true;
+			auto_render = true;
+
+			request.route.eval.run();
 			
-			// _auto_render
-			if( is_defined( request.route.api.action ) )
-			{
-				this[ request.route.api.action ]( ); 
-			}
-			
-			if( _auto_render == false ) return;
+			if( auto_render == false ) return;
 			
 			_layout.gunz_render_done.add( _after_render, request ).once( );
 			

@@ -150,7 +150,7 @@ package cocktail.lib
 			var node : XML;
 			var action : String;
 			
-			action = request.route.api.action;
+			action = request.route.eval.action;
 			assets = [];
 			
 			list = xml_node.children( );
@@ -454,6 +454,7 @@ package cocktail.lib
 		private function _after_render( bullet : ViewBullet ) : void
 		{
 			log.info( "Running..." );
+
 			after_render( bullet.params );
 			bullet;
 		}

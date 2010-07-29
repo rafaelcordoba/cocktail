@@ -42,7 +42,7 @@ package cocktail.lib.models.datasources
 				src = StringUtil.innerb( src );
 			else
 			{
-				folder = _request.route.api.folder + "/";
+				folder = _request.route.eval.controller.name + "/";
 				src = _cocktail.config.path( "xml" ) + "models/" + folder + src;
 			}
 		}

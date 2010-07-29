@@ -3,6 +3,7 @@ package cocktail.lib
 	import cocktail.Cocktail;
 	import cocktail.core.gunz.Bullet;
 	import cocktail.core.request.Request;
+	import cocktail.core.router.RouteEval;
 	import cocktail.core.slave.Slave;
 	import cocktail.core.slave.gunz.ASlaveBullet;
 	import cocktail.core.slave.slaves.TextSlave;
@@ -101,24 +102,24 @@ package cocktail.lib
 			var list : XMLList;
 			var action : String;
 			
-			action = request.route.api.action;
+			action = request.route.eval.action;
 			
 			//this will parse <{action}>
 			//list = _xml[ action ];
 			
 			//this will parse <area id="{action}">
-			list = _xml[ 'area' ].( @id == action || @id == "*" );
+			list = _xml[ 'action' ].( @id == action || @id == "*" );
 			
 			if( list )
 				xml_node = XML( list.toXMLString( ) );
 			
 			//TODO: If target isnt rendered, redirect to asset page
-			if( !factory.layout( name ).children.has( "" ) )
+			if( scope == null )
 			{
 				//redirect
 			}
 			
-			_loader.reset();			
+			_loader.reset( );			
 			
 			if( !super.load( request ) ) return false;
 			
@@ -130,7 +131,7 @@ package cocktail.lib
 			}
 			else
 			{
-				_after_load();
+				_after_load( );
 				
 				var bullet : ViewBullet;
 				
@@ -175,6 +176,10 @@ package cocktail.lib
 			sprite.parent.removeChild( sprite );
 		}
 
+		
+		/* PUBLIC GETTERS */
+		
+		
 		/**
 		 * Returns true if childs.request is equal to param request
 		 * @param request	The request you would check if is rendered
@@ -185,16 +190,36 @@ package cocktail.lib
 			return children.request == request; 
 		}
 
-
-		/* PUBLIC GETTERS */
-
-
 		override public function get loader() : Slave
 		{
 			return _loader;
 		}
-		
-		
+
+		/**
+		 * 
+		 * @param path	path to the desired view i.e. player.controls.play
+		 */
+		public function child( path : String ) : View
+		{
+			var steps : Array;
+			var view : View;
+			
+			if( !path ) return null;
+			
+			view  = this;
+			steps = path.split( "." );
+			
+			while ( steps.length )
+			{
+				if( !view.children.has( steps[ 0 ] ) )
+					return null;
+					
+				view = view.children.by_id( steps.shift( ) );
+			}
+			
+			return view;
+		}
+
 		/* PRIVATE GETTERS */
 
 		/**
@@ -207,7 +232,7 @@ package cocktail.lib
 			
 			return "layouts/" + StringUtil.toUnderscore( name ) + ".xml";
 		}
-		
+
 		
 		/** 
 		 * ATRIBUTTE SETTERS
@@ -226,26 +251,14 @@ package cocktail.lib
 		{
 			_target = path;
 		}
-		
-		
+
 		public function get scope() : View 
 		{
-			var full_path : Array;
-			var controller_name : String;
-			var action_name : String;
-			var asset_id : String;
+			var eval : RouteEval;
 			
-			//ATT: see Route::api
-			full_path = String( xml_node.attribute( 'target' ) ).split( ":" ); 
+			eval = new RouteEval( String( xml_node.attribute( 'target' ) ) );
 			
-			controller_name = full_path[ 0 ][ 'split' ]( '/' )[ 0 ];
-			action_name     = full_path[ 0 ][ 'split' ]( '/' )[ 1 ];
-			asset_id        = full_path[ 1 ];
-
-			if( !factory.layout( controller_name ).children.by_id( asset_id ) )
-				return null;
-			
-			return factory.layout( name ).children.by_id( asset_id );
+			return eval.view;
 		}
 	}
 }

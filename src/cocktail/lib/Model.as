@@ -148,7 +148,7 @@ package cocktail.lib
 			var inject : String;
 			
 			ds = []; 
-			action = request.route.api.action;
+			action = request.route.eval.action;
 			
 			do
 			{

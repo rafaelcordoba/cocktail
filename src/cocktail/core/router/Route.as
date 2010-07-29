@@ -11,7 +11,7 @@ package cocktail.core.router
 	public class Route extends Index 
 	{
 		/* VARS */
-		private var _api : API;
+		private var _eval : RouteEval;
 
 		private var _uri : String;
 
@@ -55,9 +55,9 @@ package cocktail.core.router
 		private function _resolve() : void
 		{
 			_locale = _get_locale( _uri );
-			_mask = routes.wrap( _purge_locale( _uri ) );
+			_mask   = routes.wrap( _purge_locale( _uri ) );
 			_target = routes.unwrap( _purge_locale( _uri ) );
-			( _api = new API( _target ) ).boot( _cocktail );
+			_eval   = new RouteEval( _target ).boot( _cocktail );
 		}
 
 		/**
@@ -117,90 +117,13 @@ package cocktail.core.router
 		}
 
 		/**
-		 * Returns the route API.
-		 * @return	Route API.
+		 * Map the API based on route url
+		 * 
+		 * @return	RouteEval
 		 */
-		public function get api() : API
+		public function get eval() : RouteEval
 		{
-			return _api;
+			return _eval;
 		}
-	}
-}
-
-import cocktail.Cocktail;
-import cocktail.core.Index;
-import cocktail.lib.Controller;
-import cocktail.utils.StringUtil;
-
-/**
- * Route API - stores system execution infos (controller, action, params).
- * @author nybras | nybras@codeine.it 
- */
-internal class API extends Index
-{
-	/* ---------------------------------------------------------------------
-	VARS
-	--------------------------------------------------------------------- */
-	private var _uri : String;
-
-	private var _index : Index;
-
-	public var controller : String;
-
-	public var action : String;
-
-	public var params : *;
-
-	public var folder : String;
-
-	/* ---------------------------------------------------------------------
-	INITIALIZING
-	--------------------------------------------------------------------- */
-	
-	/**
-	 * Translates the given uri to an API call.
-	 * @param uri	URI to be translated.
-	 */
-	public function API( uri : String )
-	{
-		_uri = uri;
-	}
-
-	/* ---------------------------------------------------------------------
-	BOOTING
-	--------------------------------------------------------------------- */
-	
-	/**
-	 * Boots the Index base class.
-	 * @param cocktail	Cocktail reference.
-	 */
-	override public function boot( cocktail : Cocktail ) : *
-	{
-		var parts : Array;
-		var s : *;
-		
-		s = super.boot( cocktail );
-		
-		parts = _uri.split( "/" );
-		
-		controller = StringUtil.toCamel( parts[ 0 ] );
-		folder = StringUtil.toUnderscore( controller );
-		action = parts[ 1 ];
-		params = [].concat( parts.slice( 2 ) );
-		
-		return s;
-	}
-
-	/* ---------------------------------------------------------------------
-	RUNNING
-	--------------------------------------------------------------------- */
-	
-	/**
-	 * Runs the API call into the given controller.
-	 * @param controller	Controller to run the API call.
-	 */
-	public function run( controller : Controller ) : *
-	{
-		return _index.exec( controller, action, params );
 	}
 }

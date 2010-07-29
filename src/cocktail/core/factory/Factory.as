@@ -118,6 +118,8 @@ package cocktail.core.factory
 			var klass: Class;
 			var controller : Controller;
 		
+			name = StringUtil.toCamel( name );
+			
 			// app/controllers/{area}/{name}Controller
 			klass = _mvcl( CONTROLLERS, name + COONTROLLER_SUFIX );
 				
@@ -137,8 +139,8 @@ package cocktail.core.factory
 				return _controllers[ name ];
 			else
 			{
-				controller = Controller( new ( klass )( ) ).boot( _cocktail );
-				_controllers[ name ] = controller;
+				_controllers[ name ] = controller = new klass();
+				controller.boot( _cocktail );
 			}
 			
 			return controller;
