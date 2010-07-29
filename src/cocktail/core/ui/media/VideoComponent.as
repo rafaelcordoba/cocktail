@@ -1,7 +1,9 @@
 package cocktail.core.ui.media 
 {
+	import cocktail.core.Index;
 	import cocktail.core.gunz.Gun;
 	import cocktail.core.gunz.Gunz;
+	import cocktail.core.logger.Logger;
 	import cocktail.core.ui.media.gunz.VideoBullet;
 
 	import gs.TweenMax;
@@ -40,7 +42,7 @@ package cocktail.core.ui.media
 		public var video_height : Number;
 		public var video_volume : Number;
 		
-		public var gunz_time : Gun;
+		public var on_time : Gun;
 		public var gunz_play : Gun;
 		public var gunz_pause : Gun;
 		public var gunz_stop : Gun;
@@ -100,7 +102,7 @@ package cocktail.core.ui.media
 		private function _get_gunz() : void 
 		{
 			gunz = new Gunz( this );
-			gunz_time          = new Gun( gunz, this, VideoBullet.TIME ); 
+			on_time          = new Gun( gunz, this, VideoBullet.TIME ); 
 			gunz_play          = new Gun( gunz, this, VideoBullet.PLAY );
 			gunz_pause         = new Gun( gunz, this, VideoBullet.PAUSE );
 			gunz_stop          = new Gun( gunz, this, VideoBullet.STOP );
@@ -145,7 +147,7 @@ package cocktail.core.ui.media
 		
 		private function _pull_time(event : TimerEvent) : void
 		{
-			gunz_time.shoot( _drop() );
+			on_time.shoot( _drop() );
 		}
 
 		private function _drop(): VideoBullet
@@ -251,13 +253,27 @@ package cocktail.core.ui.media
 				gunz_stop.shoot( _drop() );
 		}
 
-		public function seek( percentage : Number ) : void
+		public function seek( percentage : Number, play: Boolean = false ) : void
 		{
 			percentage = Math.floor( percentage * 1000 ) / 1000;
 			 
 			var bullet : VideoBullet;
+			var seconds : Number;
+			var pct_loaded : Number;
 			
-			_ns.seek( Math.round( percentage * duration ) );
+			pct_loaded = bytes_loaded / bytes_total;
+			
+			if ( percentage > pct_loaded )
+				percentage = pct_loaded;
+				
+			seconds = Math.floor( percentage * duration );
+			
+			_ns.seek( seconds );
+			
+			if( play)
+				_ns.resume();
+			else
+				_ns.pause();
 			
 			bullet = _drop();
 			
@@ -304,8 +320,6 @@ package cocktail.core.ui.media
 			bullet = _drop();
 			bullet.info = event.info;
 			
-			gunz_net_status.shoot( bullet );
-			
 			bullet = _drop();
 			bullet.info = event.info;
 			
@@ -316,10 +330,12 @@ package cocktail.core.ui.media
 				break;
 				
 				case "NetStream.Buffer.Full":
+					_ns.bufferTime = 1;
 					gunz_bufer_full.shoot( bullet );
 				break;
 		
 				case "NetStream.Buffer.Empty":
+					_ns.bufferTime = _buffer_time;
 					gunz_buffer_empty.shoot( bullet );
 				break;
 				
@@ -330,10 +346,14 @@ package cocktail.core.ui.media
 						gunz_play_complete.shoot( bullet );
 				break;
 				
-				case "NetStream.Play.Complete":
-					//just a joke?
+				case "NetStream.Seek.InvalidTime":
+					trace( '############', 'NetStream.Seek.InvalidTime' );
+					_ns.seek( Number( event.info[ 'details' ] ) );
+					_ns.resume();
 				break;
 			}
+			
+			gunz_net_status.shoot( bullet );
 		}
 
 		

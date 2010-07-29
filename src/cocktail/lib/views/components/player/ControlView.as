@@ -19,16 +19,15 @@ package cocktail.lib.views.components.player
 	public class ControlView extends SwfView
 	{
 		private var _video : VideoComponent;
-		private var _gun_mouse_move : Gun;
-		private var _gun_stage_up : Gun;
+		private var on_drag : Gun;
+		private var on_stage_up : Gun;
+		private var _playing_before_seek : Boolean;
 
 		override protected function _instantiate_display() : * 
 		{
 			super._instantiate_display( );
 			
 			_video = VideoView( up.children.by_id( 'video' ) ).video_component;
-			
-			log.debug( _video );
 			
 			bar_loaded.scaleX = 1;
 			bar_loaded.buttonMode = true;
@@ -40,6 +39,9 @@ package cocktail.lib.views.components.player
 			time_clip.buttonMode = true;
 			time_clip.mouseChildren = false;
 			
+			volume_slider.buttonMode = true;
+			volume_slider.mouseChildren = false;
+			
 			btn_toggle_play.gotoAndStop( 2 );
 			
 			swf.alpha = 0;
@@ -49,36 +51,44 @@ package cocktail.lib.views.components.player
 		{
 			super.set_triggers();
 			
-			_video.gunz_time.add( _on_playhead_move );
+			_video.on_time.add( _on_playhead_move );
+			_video.gunz_on_metadata.add( _align_controls );
 			
+			player.on_roll_over.add( show_control );
+			player.on_roll_out.add( hide_control );
+						
 			listen( btn_toggle_play, MouseEvent.CLICK ).add( _toggle_play );
-			listen( bar_loaded, MouseEvent.CLICK ).add( _seek_click );
-			listen( bar_loaded, MouseEvent.MOUSE_DOWN ).add( _on_mouse_down );
-			listen( time_clip, MouseEvent.MOUSE_DOWN ).add( _on_mouse_down );
 			
-			InteractiveView( up ).on_roll_over.add( show_control );
-			InteractiveView( up ).on_roll_out.add( hide_control );
+			listen( bar_loaded, MouseEvent.MOUSE_DOWN ).add( _on_time_seek_start );
+			listen( bar_loaded, MouseEvent.CLICK ).add( _seek_release );
 			
-			VideoView( up.children.by_id( 'video' ) ).video_component.gunz_on_metadata.add( _place_control );
+			listen( time_clip, MouseEvent.MOUSE_DOWN ).add( _on_time_seek_start );
+			
+			listen( volume_slider, MouseEvent.MOUSE_DOWN ).add( _on_mouse_down_volume );
+			
+			on_drag     = listen( stage, MouseEvent.MOUSE_MOVE );
+			on_stage_up = listen( stage, MouseEvent.MOUSE_UP );
 		}
-		
-		private function _place_control( ...args ) : void
+
+		private function _align_controls( ...args ) : void
 		{
-			TweenMax.to( swf, 0.3, { alpha:1 } );
-			
 			swf.x = 5;
 			swf.y = _video.video_height - bg.height - 5;
 			
 			bg.width = _video.video_width - 10;
 			
-			bar_base[ 'bar' ][ 'width' ] 	= bg.width - seek_bar.x - 20;
-			bar_loaded[ 'bar' ][ 'width' ] 	= bg.width - seek_bar.x - 20;
-			bar_played[ 'bar' ][ 'width' ] 	= bg.width - seek_bar.x - 20;
+			btn_toggle_play.x = 10;
+			seek_bar.x = btn_toggle_play.x + btn_toggle_play.width + 10;
+			volume_slider.x = bg.width - volume_slider.width - 10;
+			
+			bar_base[ 'bar' ][ 'width' ] 	= bg.width - seek_bar.x - volume_slider.width - 20;
+			bar_loaded[ 'bar' ][ 'width' ] 	= bg.width - seek_bar.x - volume_slider.width - 20;
+			bar_played[ 'bar' ][ 'width' ] 	= bg.width - seek_bar.x - volume_slider.width - 20;
 		}
 
 		private function show_control( ...args  ) : void 
 		{
-			_place_control();
+			_align_controls();
 			
 			TweenMax.to( swf, 0.3, { alpha:1 } );
 		}
@@ -104,54 +114,89 @@ package cocktail.lib.views.components.player
 			}
 		}
 
-		private function _on_mouse_up( ...args ) : void 
+		private function _on_volume_release( ...args ) : void 
 		{
-			log.debug();
-			
-			if ( _gun_mouse_move )
-			{
-				_gun_mouse_move.rm( _on_mouse_move );
-				_gun_mouse_move = null;
-			}
-			
-			if ( _gun_stage_up )
-			{
-				_gun_stage_up.rm( _on_mouse_up );
-				_gun_stage_up = null;
-			}
+			on_drag.rm( _on_drag_volume );
 		}
 
-		private function _on_mouse_down( ...args ) : void 
+		private function _on_time_release( ...args ): void
 		{
-			log.debug();
+			_seek_release();
 			
-			_gun_mouse_move = listen( sprite.stage, MouseEvent.MOUSE_MOVE );
-			_gun_mouse_move.add( _on_mouse_move );
-			
-			_gun_stage_up = listen( sprite.stage, MouseEvent.MOUSE_UP );
-			_gun_stage_up.add( _on_mouse_up );
-		}
-
-		private function _on_mouse_move( ...args ) : void 
-		{
-//			log.debug();
-			
-			_seek_click();
+			on_drag.rm( _seek );
 		}
 		
-		private function _seek_click( ...args ) : void 
+		/**
+		 * Called when user starts to drag the time tooltip
+		 */
+		private function _on_time_seek_start( ...args ) : void 
+		{
+			_save_video_status();
+			
+			on_drag.add( _seek );
+			
+			on_stage_up.add( _on_time_release ).once();
+		}
+		
+		private function _on_mouse_down_volume( ...args  ) : void
+		{
+			_video.volume = _resize_volume_slider();
+			_resize_volume_slider();
+			
+			on_drag.add( _on_drag_volume );
+			
+			on_stage_up.add( _on_volume_release ).once();
+		}
+
+		private function _save_video_status( ...args ): void
+		{
+			_playing_before_seek = _video.is_playing;
+		}
+
+		private function _on_drag_volume( ...args ) : void 
+		{
+			_video.volume = _resize_volume_slider();
+
+			_resize_volume_slider();
+		}
+		
+		private function _resize_volume_slider() : Number
 		{
 			var pct : Number;
 			
-			pct = bar_loaded.mouseX / bar_base.width;
+			pct = volume_slider.mouseX / volume_slider[ 'base' ][ 'width' ];
+			
+			if ( pct > 1 )
+				pct = 1;
+				
+			if ( pct < 0 )
+				pct = 0;
+			
+			slider.scaleX = pct;
+			
+			return pct;
+		}
+		
+		private function _seek_release( ...args ) : void 
+		{
+			var pct : Number;
+			
+			pct = seek_bar.mouseX / bar_base.width;
+			
+			_video.seek( pct, _playing_before_seek );
+		}
+		
+		private function _seek( ...args ) : void 
+		{
+			var pct : Number;
+			
+			pct = seek_bar.mouseX / bar_base.width;
 			
 			_video.seek( pct );
 		}
 		
 		private function _on_playhead_move( bullet : VideoBullet ) : void
 		{
-//			log.debug( bullet.seconds_played );
-			
 			txt_played.text = bullet.time_played;
 			
 			bar_loaded.scaleX = bullet.buffered;
@@ -170,7 +215,15 @@ package cocktail.lib.views.components.player
 			TweenMax.to( sprite, 0.3, { autoAlpha:0 } );
 		}
 		
+		
 		/* Getters */
+		
+		
+		
+		public function get player(): PlayerView
+		{
+			return PlayerView( InteractiveView( up ) );
+		}
 		
 		public function get bg() : MovieClip
 		{
@@ -210,6 +263,21 @@ package cocktail.lib.views.components.player
 		public function get txt_played() : TextField
 		{
 			return time_clip[ 'txt_played' ];
+		}
+		
+		public function get volume_slider() : MovieClip
+		{
+			return swf[ 'volume_slider' ];
+		}
+		
+		public function get slider() : MovieClip
+		{
+			return volume_slider[ 'slider' ];
+		}
+		
+		public function get slider_mask() : MovieClip
+		{
+			return volume_slider[ 'mask_mc' ];
 		}
 	}
 }

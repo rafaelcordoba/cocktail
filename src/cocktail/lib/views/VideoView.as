@@ -10,6 +10,9 @@ package cocktail.lib.views
 	 */
 	public class VideoView extends InteractiveView 
 	{
+		private const DEFAULT_VOLUME : Number = 1;
+		private const DEFAULT_BUFFER : Number = 3;
+		
 		public var video_component : VideoComponent;
 		
 		private var _video_slave : VideoSlave;
@@ -42,8 +45,8 @@ package cocktail.lib.views
 		{
 			var _video_width : Number;
 			var _video_height : Number;
-			var _video_buffer : Number;
-			var _video_volume : Number;
+			var _video_buffer : Number = DEFAULT_BUFFER;
+			var _video_volume : Number = DEFAULT_VOLUME;
 			
 			_video_slave = VideoSlave( bullet.owner );
 			
@@ -57,14 +60,19 @@ package cocktail.lib.views
 				_video_buffer = n( attribute( 'buffer' ) ); 
 				
 			if( attribute( 'volume' ) )
-				_video_volume = n( attribute( 'volume' ) ); 
+			{
+				_video_volume = n( attribute( 'volume' ) );
 				
+				if ( _video_volume > 1 )
+					_video_volume = 1;
+			} 
+			
 			video_component = new VideoComponent( null, 
 												  _video_width, 
 												  _video_height, 
 												  _video_buffer, 
 												  _video_volume );
-												  
+			
 			video_component.attach_ns( _video_slave.net_stream );
 		}
 		
@@ -81,7 +89,7 @@ package cocktail.lib.views
 			
 			sprite.addChild( video_component.video );
 			
-			if( attribute( 'auto_play' ) == 'true' )
+			if( attribute( 'auto_play' ) != 'false' )
 				video_component.play( );
 			
 			return null;
