@@ -19,7 +19,7 @@ package cocktail.core.config
 	public class Config extends Index
 	{
 		/* VARS */
-		private var _raw : XML;
+		private var _xml : XML;
 
 		private var _current_locale : String;
 
@@ -61,7 +61,7 @@ package cocktail.core.config
 		 */
 		private function _xml_loaded( event : Event ) : void 
 		{
-			_raw = new XML( String( _xml_loader.data ) );
+			_xml = new XML( String( _xml_loader.data ) );
 			
 			_init_stage( );
 			
@@ -82,7 +82,7 @@ package cocktail.core.config
 		{
 			var route : XML;
 			
-			for each( route in _raw..route )
+			for each( route in _xml..route )
 				routes.map( route.@mask, route.@target );
 			
 			router.init( );
@@ -135,8 +135,8 @@ package cocktail.core.config
 		 */
 		public function cache( environment : String = null ) : Boolean
 		{
-			environment = ( environment || _raw..paths.@default );
-			return( _raw..cache.@[ environment ] == "true" );
+			environment = ( environment || _xml..paths.@default );
+			return( _xml..cache.@[ environment ] == "true" );
 		}
 
 		/**
@@ -148,8 +148,8 @@ package cocktail.core.config
 		 */
 		public function root( environment : String = null ) : String
 		{
-			environment = ( environment || _raw..paths.@default );
-			return _raw..paths.path.( @name == environment ).@url;
+			environment = ( environment || _xml..paths.@default );
+			return _xml..paths.path.( @name == environment ).@url;
 		}
 
 		/**
@@ -177,7 +177,7 @@ package cocktail.core.config
 		 */
 		public function path( extension : String ) : String
 		{
-			return	root( ) + _raw..path.( attribute( "ext" ) == extension ).@folder;
+			return	root( ) + _xml..path.( attribute( "ext" ) == extension ).@folder;
 		}
 
 		/**
@@ -188,8 +188,8 @@ package cocktail.core.config
 		 */
 		public function gateway( name : String = null ) : String
 		{
-			if( name == null ) name = _raw..gateways.@default;
-			return _raw..gateway.( attribute( "name" ) == name ).@url;
+			if( name == null ) name = _xml..gateways.@default;
+			return _xml..gateway.( attribute( "name" ) == name ).@url;
 		}
 
 		/* LOCALE */
@@ -204,7 +204,7 @@ package cocktail.core.config
 			var locale : XML;
 			
 			locales = new Array( );
-			for each( locale in _raw..languages.* )
+			for each( locale in _xml..languages.* )
 				locales.push( locale.localName( ) );
 			
 			return locales;
@@ -216,7 +216,7 @@ package cocktail.core.config
 		 */
 		public function get default_locale( ) : String
 		{
-			return _raw..languages.@default;
+			return _xml..languages.@default;
 		}
 
 		/**
@@ -245,7 +245,7 @@ package cocktail.core.config
 		 */
 		private function movie( property : String ) : *
 		{
-			return _raw..movie.@[ property ];
+			return _xml..movie.@[ property ];
 		}
 
 		/**
