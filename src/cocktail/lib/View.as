@@ -322,7 +322,7 @@ package cocktail.lib
 			
 			set_triggers();
 			
-			children.on_render_complete.add( _childs_rendred, request ).once();
+			children.on_render_complete.add( _after_render_children, request ).once();
 			
 			children.render( request );
 			
@@ -336,7 +336,7 @@ package cocktail.lib
 		{
 		}
 
-		protected function _childs_rendred( bullet: ViewBullet ): void
+		protected function _after_render_children( bullet: ViewBullet ): void
 		{
 			log.info( "Running..." );
 			_render( bullet.params );
