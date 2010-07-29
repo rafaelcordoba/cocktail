@@ -21,7 +21,6 @@ package cocktail.lib.views.components.player
 		private var _video : VideoComponent;
 		private var on_drag : Gun;
 		private var on_stage_up : Gun;
-		private var _playing_before_seek : Boolean;
 
 		override protected function _instantiate_display() : * 
 		{
@@ -52,7 +51,7 @@ package cocktail.lib.views.components.player
 			super.set_triggers();
 			
 			_video.on_time.add( _on_playhead_move );
-			_video.gunz_on_metadata.add( _align_controls );
+			_video.on_metadata.add( _align_controls );
 			
 			player.on_roll_over.add( show_control );
 			player.on_roll_out.add( hide_control );
@@ -131,8 +130,6 @@ package cocktail.lib.views.components.player
 		 */
 		private function _on_time_seek_start( ...args ) : void 
 		{
-			_save_video_status();
-			
 			on_drag.add( _seek );
 			
 			on_stage_up.add( _on_time_release ).once();
@@ -146,11 +143,6 @@ package cocktail.lib.views.components.player
 			on_drag.add( _on_drag_volume );
 			
 			on_stage_up.add( _on_volume_release ).once();
-		}
-
-		private function _save_video_status( ...args ): void
-		{
-			_playing_before_seek = _video.is_playing;
 		}
 
 		private function _on_drag_volume( ...args ) : void 
@@ -183,7 +175,7 @@ package cocktail.lib.views.components.player
 			
 			pct = seek_bar.mouseX / bar_base.width;
 			
-			_video.seek( pct, _playing_before_seek );
+			_video.seek( pct );
 		}
 		
 		private function _seek( ...args ) : void 

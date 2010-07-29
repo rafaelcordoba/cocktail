@@ -43,18 +43,18 @@ package cocktail.core.ui.media
 		public var video_volume : Number;
 		
 		public var on_time : Gun;
-		public var gunz_play : Gun;
-		public var gunz_pause : Gun;
-		public var gunz_stop : Gun;
-		public var gunz_seek : Gun;
-		public var gunz_mute : Gun;
-		public var gunz_unmute : Gun;
-		public var gunz_net_status : Gun;
-		public var gunz_on_metadata : Gun;
-		public var gunz_load_error : Gun;
-		public var gunz_bufer_full : Gun;
-		public var gunz_buffer_empty : Gun;
-		public var gunz_play_complete : Gun;
+		public var on_play : Gun;
+		public var on_pause : Gun;
+		public var on_stop : Gun;
+		public var on_seek : Gun;
+		public var on_mute : Gun;
+		public var on_unmute : Gun;
+		public var on_net_status : Gun;
+		public var on_metadata : Gun;
+		public var on_load_error : Gun;
+		public var on_bufer_full : Gun;
+		public var on_buffer_empty : Gun;
+		public var on_play_complete : Gun;
 
 		public function VideoComponent( 
 			scope : Sprite = null, 
@@ -101,20 +101,20 @@ package cocktail.core.ui.media
 		
 		private function _get_gunz() : void 
 		{
-			gunz = new Gunz( this );
+			gunz 			 = new Gunz( this );
 			on_time          = new Gun( gunz, this, VideoBullet.TIME ); 
-			gunz_play          = new Gun( gunz, this, VideoBullet.PLAY );
-			gunz_pause         = new Gun( gunz, this, VideoBullet.PAUSE );
-			gunz_stop          = new Gun( gunz, this, VideoBullet.STOP );
-			gunz_seek          = new Gun( gunz, this, VideoBullet.SEEK );
-			gunz_mute          = new Gun( gunz, this, VideoBullet.MUTE );
-			gunz_unmute        = new Gun( gunz, this, VideoBullet.UNMUTE );
-			gunz_net_status    = new Gun( gunz, this, VideoBullet.NET_STATUS );
-			gunz_on_metadata   = new Gun( gunz, this, VideoBullet.METADATA );
-			gunz_load_error    = new Gun( gunz, this, VideoBullet.LOAD_ERROR );
-			gunz_bufer_full    = new Gun( gunz, this, VideoBullet.BUFFER_FULL );
-			gunz_buffer_empty  = new Gun( gunz, this, VideoBullet.BUFFER_EMPTY );
-			gunz_play_complete = new Gun( gunz, this, VideoBullet.PLAY_COMPLETE );
+			on_play          = new Gun( gunz, this, VideoBullet.PLAY );
+			on_pause         = new Gun( gunz, this, VideoBullet.PAUSE );
+			on_stop          = new Gun( gunz, this, VideoBullet.STOP );
+			on_seek          = new Gun( gunz, this, VideoBullet.SEEK );
+			on_mute          = new Gun( gunz, this, VideoBullet.MUTE );
+			on_unmute        = new Gun( gunz, this, VideoBullet.UNMUTE );
+			on_net_status    = new Gun( gunz, this, VideoBullet.NET_STATUS );
+			on_metadata  	 = new Gun( gunz, this, VideoBullet.METADATA );
+			on_load_error    = new Gun( gunz, this, VideoBullet.LOAD_ERROR );
+			on_bufer_full    = new Gun( gunz, this, VideoBullet.BUFFER_FULL );
+			on_buffer_empty  = new Gun( gunz, this, VideoBullet.BUFFER_EMPTY );
+			on_play_complete = new Gun( gunz, this, VideoBullet.PLAY_COMPLETE );
 		}
 
 		private function _set_triggers() : void
@@ -211,7 +211,7 @@ package cocktail.core.ui.media
 			var bullet : VideoBullet;
 			bullet = _drop();
 			
-			gunz_on_metadata.shoot( bullet );
+			on_metadata.shoot( bullet );
 		}
 
 		public function unload() : void 
@@ -227,7 +227,7 @@ package cocktail.core.ui.media
 			_playhead_timer.stop( );
 			_playhead_timer.start( );
 			
-			gunz_play.shoot( _drop() );
+			on_play.shoot( _drop() );
 		}
 
 		public function pause( ...args ) : void
@@ -238,7 +238,7 @@ package cocktail.core.ui.media
 			
 			//_playhead_timer.stop( );
 			
-			gunz_pause.shoot( _drop() );
+			on_pause.shoot( _drop() );
 		}
 
 		public function stop( pull_bullet : Boolean = true ) : void
@@ -250,10 +250,10 @@ package cocktail.core.ui.media
 			_playhead_timer.stop( );
 			
 			if( pull_bullet )
-				gunz_stop.shoot( _drop() );
+				on_stop.shoot( _drop() );
 		}
 
-		public function seek( percentage : Number, play: Boolean = false ) : void
+		public function seek( percentage : Number ) : void
 		{
 			percentage = Math.floor( percentage * 1000 ) / 1000;
 			 
@@ -270,14 +270,14 @@ package cocktail.core.ui.media
 			
 			_ns.seek( seconds );
 			
-			if( play)
+			if( is_playing )
 				_ns.resume();
 			else
 				_ns.pause();
 			
 			bullet = _drop();
 			
-			gunz_seek.shoot( bullet );
+			on_seek.shoot( bullet );
 		}
 
 		/** audio controls **/
@@ -293,7 +293,7 @@ package cocktail.core.ui.media
 				volume: 0
 			} );
 			
-			gunz_mute.shoot( _drop() );
+			on_mute.shoot( _drop() );
 		}
 
 		public function unmute() : void
@@ -304,7 +304,7 @@ package cocktail.core.ui.media
 				volume: _volume_before_mute
 			} );
 			
-			gunz_unmute.shoot( _drop() );
+			on_unmute.shoot( _drop() );
 		}
 
 		
@@ -326,34 +326,39 @@ package cocktail.core.ui.media
 			switch( event.info[ 'code' ] )
 			{
 				case "NetStream.Play.StreamNotFound":
-					gunz_load_error.shoot( bullet );
+					on_load_error.shoot( bullet );
 				break;
 				
 				case "NetStream.Buffer.Full":
 					_ns.bufferTime = 1;
-					gunz_bufer_full.shoot( bullet );
+					on_bufer_full.shoot( bullet );
 				break;
 		
 				case "NetStream.Buffer.Empty":
 					_ns.bufferTime = _buffer_time;
-					gunz_buffer_empty.shoot( bullet );
+					on_buffer_empty.shoot( bullet );
 				break;
 				
 				case "NetStream.Play.Stop":
 					if( !is_playing )
-						gunz_stop.shoot( bullet );
+						on_stop.shoot( bullet );
 					else
-						gunz_play_complete.shoot( bullet );
+						on_play_complete.shoot( bullet );
 				break;
 				
 				case "NetStream.Seek.InvalidTime":
-					trace( '############', 'NetStream.Seek.InvalidTime' );
+					
+					// Seeking to last valid time
 					_ns.seek( Number( event.info[ 'details' ] ) );
-					_ns.resume();
+					
+					if ( is_playing )
+						_ns.resume();
+					else
+						_ns.pause();
 				break;
 			}
 			
-			gunz_net_status.shoot( bullet );
+			on_net_status.shoot( bullet );
 		}
 
 		

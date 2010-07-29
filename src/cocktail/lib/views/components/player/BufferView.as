@@ -23,8 +23,8 @@ package cocktail.lib.views.components.player
 		{
 			super.set_triggers();
 			
-			_video.gunz_net_status.add( _on_net_status );
-			_video.gunz_on_metadata.add( _center_buffer );
+			_video.on_net_status.add( _on_net_status );
+			_video.on_metadata.add( _center_buffer );
 		}
 
 		private function _on_net_status( bullet : VideoBullet ) : void 
