@@ -2,6 +2,8 @@ package cocktail.core.gunz
 {
 	import flash.events.IEventDispatcher;
 
+	
+	
 	/**
 	 * <p>The Gun class is the base class for dispatching events without having 
 	 * to use EventDispatcher.</p>
@@ -36,19 +38,17 @@ package cocktail.core.gunz
 		
 		/** Gun owner. */
 		private var _owner : *;
-
 		/** Gunz list. */
 		private var _gunz : Gunz;
-
 		/** Gun type. */
 		private var _type : String;
-
 		/** Gun victims listeners. */
 		private var _victims : Array;
-
 		/** Captured items list. */
 		private var _captured : Array;
 
+		
+		
 		/* INITIALIZING */
 		
 		/**
@@ -106,7 +106,7 @@ package cocktail.core.gunz
 			if( _victims.length ) do
 			{
 				victim = Victim( _victims[ i ] );
-				victim.scream( bullet || new Bullet( ) );
+				victim.scream( bullet || bullet );
 			} while( ++i < _victims.length );
 			
 			return bullet;
@@ -153,7 +153,7 @@ package cocktail.core.gunz
 				{
 					_victims.splice( i, 1 );
 					
-					victim.destroy();
+					victim.destroy( );
 					
 					break;
 				}
