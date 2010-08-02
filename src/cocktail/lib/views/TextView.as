@@ -44,7 +44,7 @@ package cocktail.lib.views
 			if ( attribute( 'antiAliasType' ) )
 				field.antiAliasType = attribute( 'antiAliasType' );
 			
-			if ( attribute( 'alwaysShowSelection ' ) )
+			if ( attribute( 'alwaysShowSelection' ) )
 				field.alwaysShowSelection = attribute( 'alwaysShowSelection' ) == 'true' ? true : false;
 				
 			if ( attribute( 'autoSize' ) )
