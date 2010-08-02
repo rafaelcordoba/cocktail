@@ -7,7 +7,7 @@ package cocktail.core.embedder
 	import cocktail.lib.models.datasources.XmlDataSource;
 	import cocktail.lib.views.ImgView;
 	import cocktail.lib.views.SwfView;
-	import cocktail.lib.views.TextFieldView;
+	import cocktail.lib.views.TextView;
 	import cocktail.lib.views.VideoView;
 	import cocktail.lib.views.components.player.PlayerView;
 	import cocktail.lib.views.components.player.BufferView;
@@ -30,7 +30,7 @@ package cocktail.core.embedder
 			
 			ImgView;
 			SwfView;
-			TextFieldView;
+			TextView;
 			VideoView;
 			PlayerView;
 			ControlView;

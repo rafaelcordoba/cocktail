@@ -161,7 +161,9 @@ package cocktail.lib
 			do
 			{
 				node = list[i];
-					
+				
+				if( node.nodeKind() == 'text' ) continue;
+				
 				assets.push( _instantiate_view( node ) );
 			} while( ++i < list.length( ) );
 			
