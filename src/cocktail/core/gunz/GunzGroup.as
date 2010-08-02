@@ -1,6 +1,8 @@
 package cocktail.core.gunz 
 {
 
+	
+	
 	/**
 	 * Groups multiple Gun's, listens to every single one, and fires the
 	 * "complete" Gun (gunz_complete) when all Gun's have shot.
@@ -18,10 +20,11 @@ package cocktail.core.gunz
 		
 		/** Gunz list. **/
 		public var gunz : Gunz;
-
 		/** Gunz complete event. **/
 		public var gunz_complete : Gun;
 
+		
+		
 		/**
 		 * Initializes gunz event system.
 		 */
@@ -31,14 +34,17 @@ package cocktail.core.gunz
 			gunz_complete = new Gun( gunz, this, "complete" );
 		}
 
+		
+		
 		/* VARIABLES */
 		
 		/** Compute the number of fired guns, in the queue. **/
 		private var _fired : int;
-
 		/** Keeps all queued guns. **/
 		private var _items : Array;
 
+		
+		
 		/* INITIALIZING */
 		
 		/**
@@ -68,10 +74,10 @@ package cocktail.core.gunz
 		 * Listens to all queued Gun's, checking if all Gun's already finished
 		 * or not, and if it's the last, shoots a complete Gun.
 		 */
-		private function _gun_shot( ...bullet ) : void
+		private function _gun_shot( bullet : Bullet ) : void
 		{
 			if( ++_fired == _items.length )
-				gunz_complete.shoot( );
+				gunz_complete.shoot( bullet );
 		}
 	}
 }

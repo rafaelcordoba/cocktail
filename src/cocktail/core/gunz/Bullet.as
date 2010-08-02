@@ -3,6 +3,8 @@ package cocktail.core.gunz
 	import flash.events.Event;
 	import flash.utils.describeType;
 
+	
+	
 	/**
 	 * Stores all necessary and maybe useful info.
 	 * 
@@ -17,43 +19,39 @@ package cocktail.core.gunz
 		 * @private
 		 */
 		internal var _type : String;
-
 		/** 
 		 * Bullet params. 
 		 * @private
 		 */
 		internal var _params : *;
-
 		/** 
 		 * Bullet owner. 
 		 * @private
 		 */
 		internal var _owner : *;
-
 		/** 
 		 * NOW() time stamp of the fire momment. 
 		 * @private 
 		 */
 		internal var _now : Date;
-
 		/** 
 		 * Current execution time.
 		 * @private
 		 */
 		internal var _time : int;
-
 		/** 
 		 * Execution times limit. 
 		 * @private
 		 */
 		internal var _times : int;
-
 		/** 
 		 * Bullet proxied event (if captured from Adobe AS3 Events). 
 		 * @private
 		 */
 		protected var _event : Event;
 
+		
+		
 		/* INITIALIZING */
 		
 		/**
@@ -184,6 +182,9 @@ package cocktail.core.gunz
 			do
 			{
 				prop = props[ i ];
+				
+				if( !prop ) continue;
+				
 				output += "\t" + prop.@name + " : ";
 				output += String( prop.@type ).split( "::" ).pop( ) + " = ";
 				output += this[ prop.@name ] + ";\n";
