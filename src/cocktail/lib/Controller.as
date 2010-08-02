@@ -133,18 +133,22 @@ package cocktail.lib
 		 */
 		private function _load( request : Request ) : void
 		{
+			if( !_is_xml_loaded )
+			{
+				_load_xmls( request );
+				on_load_start.shoot( new ControllerBullet( ) );
+				return;
+			}
+			
 			if( !before_load( request ) ) return;
 			
 			log.info( "Running..." );
 			
-			if( _is_xml_loaded ) 
-			{
-				_load_model( request );
-				return;
-			}
-			
-			_load_xmls( request );
-			on_load_start.shoot( new ControllerBullet( ) );			
+			_load_model( request );
+			//IMP: Implement ProcessStack
+			//process.add( _model.load, request, _model.on_load_complete );
+			//process.add( _layout.load, request, _layout.on_xml_load_complete );
+			//process.add( render, request );
 		}
 
 
@@ -184,7 +188,7 @@ package cocktail.lib
 		{
 			log.info( "Running..." );
 			
-			_model.on_load_complete.add( _model_loaded, request ).once();
+			_model.on_load_complete.add( _after_load_model, request ).once();
 			
 			_model.load( request );
 		}
@@ -192,7 +196,7 @@ package cocktail.lib
 		/**
 		 * @param bullet
 		 */
-		private function _model_loaded( bullet : ModelBullet ) : void
+		private function _after_load_model( bullet : ModelBullet ) : void
 		{
 			log.info( "Running..." );
 			
@@ -206,7 +210,7 @@ package cocktail.lib
 		{
 			log.info( "Running..." );
 			
-			_layout.on_load_complete.add( _layout_loaded, request ).once();
+			_layout.on_load_complete.add( _after_load_layout, request ).once();
 			
 			_layout.load( request );
 		}
@@ -214,7 +218,7 @@ package cocktail.lib
 		/**
 		 * @param bullet
 		 */
-		private function _layout_loaded( bullet : ViewBullet ) : void
+		private function _after_load_layout( bullet : ViewBullet ) : void
 		{
 			log.info( "Running..." );
 			
